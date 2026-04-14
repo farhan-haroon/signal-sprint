@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Inference App</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style>
+    body { font-family: Arial; text-align: center; padding: 20px; }
+    input, button { padding: 10px; margin: 10px; }
+    img { max-width: 100%; height: auto; margin-top: 10px; }
+  </style>
+</head>
+<body>
+
+<h2>Upload Image</h2>
+
+<input type="file" id="fileInput">
+<br>
+<button onclick="upload()">Run Inference</button>
+
+<p id="result"></p>
+<img id="preview"/>
+
+<script>
+async function upload() {
+    const file = document.getElementById("fileInput").files[0];
+    if (!file) return;
+
+    const formData = new FormData();
+    formData.append("file", file);
+
+    document.getElementById("preview").src = URL.createObjectURL(file);
+
+    try {
+        const res = await fetch("https://corsage-drainable-trimmer.ngrok-free.dev/predict", {
+            method: "POST",
+            body: formData
+        });
+
+        const data = await res.json();
+
+        console.log(data);  // 👈 debug
+
+        document.getElementById("result").innerText =
+            "Prediction: " + data.prediction;
+
+    } catch (err) {
+        console.error(err);
+        document.getElementById("result").innerText =
+            "Error occurred";
+    }
+}
+</script>
+
+</body>
+</html>
