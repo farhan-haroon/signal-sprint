@@ -61,22 +61,31 @@ def predict(model, image_path, return_image=False):
             label = det_model.names[int(cls)]
             box = box.cpu().numpy()
 
+            if label == "bin":
+                bin_boxes.append(box)
+            elif label == "trash":
+                trash_boxes.append(box)
+
+    if len(bin_boxes) == 0:
+        return 0.0, annotated, False  # (prediction, annotated_image, bin_detected)
+
+    # Draw bounding boxes only if bin is detected
+    if det_results.boxes is not None:
+        for box, cls in zip(det_results.boxes.xyxy, det_results.boxes.cls):
+            label = det_model.names[int(cls)]
+            box = box.cpu().numpy()
+
             x1, y1, x2, y2 = map(int, box)
 
             if label == "bin":
-                bin_boxes.append(box)
                 cv2.rectangle(annotated, (x1,y1), (x2,y2), (0,255,0), 2)
                 cv2.putText(annotated, "BIN", (x1,y1-5),
                             cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0,255,0), 2)
 
             elif label == "trash":
-                trash_boxes.append(box)
                 cv2.rectangle(annotated, (x1,y1), (x2,y2), (0,0,255), 2)
                 cv2.putText(annotated, "TRASH", (x1,y1-5),
                             cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0,0,255), 2)
-
-    if len(bin_boxes) == 0:
-        return 0.0, annotated, False  # (prediction, annotated_image, bin_detected)
 
     # ---------------- SEGMENTATION ----------------
     seg_results = seg_model(img, conf=0.25)[0]
