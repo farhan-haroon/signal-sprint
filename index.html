@@ -3,22 +3,91 @@
 <head>
   <title>Inference App</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
   <style>
-    body { font-family: Arial; text-align: center; padding: 20px; }
-    input, button { padding: 10px; margin: 10px; }
-    img { max-width: 100%; height: auto; margin-top: 10px; }
+    body {
+      font-family: Arial, sans-serif;
+      background: #f5f7fb;
+      margin: 0;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+    }
+
+    .container {
+      background: white;
+      padding: 25px;
+      border-radius: 12px;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+      width: 90%;
+      max-width: 400px;
+      text-align: center;
+    }
+
+    h2 {
+      margin-bottom: 15px;
+    }
+
+    input {
+      width: 100%;
+      margin: 10px 0;
+    }
+
+    button {
+      width: 100%;
+      padding: 12px;
+      border: none;
+      border-radius: 8px;
+      background: #4CAF50;
+      color: white;
+      font-size: 16px;
+      cursor: pointer;
+    }
+
+    button:hover {
+      background: #45a049;
+    }
+
+    img {
+      width: 100%;
+      border-radius: 8px;
+      margin-top: 15px;
+    }
+
+    .result {
+      margin-top: 15px;
+      font-size: 18px;
+      font-weight: bold;
+    }
+
+    .loading {
+      color: #888;
+      font-size: 14px;
+    }
+
+    @media (max-width: 480px) {
+      .container {
+        padding: 15px;
+      }
+    }
   </style>
 </head>
+
 <body>
 
-<h2>Upload Image</h2>
+<div class="container">
+  <h2>🧠 Trash Detection</h2>
 
-<input type="file" id="fileInput">
-<br>
-<button onclick="upload()">Run Inference</button>
+  <input type="file" id="fileInput">
 
-<p id="result"></p>
-<img id="preview"/>
+  <button onclick="upload()">Run Inference</button>
+
+  <p id="status" class="loading"></p>
+  <p id="result" class="result"></p>
+
+  <img id="preview"/>
+</div>
 
 <script>
 async function upload() {
@@ -29,6 +98,8 @@ async function upload() {
     formData.append("file", file);
 
     document.getElementById("preview").src = URL.createObjectURL(file);
+    document.getElementById("status").innerText = "Processing...";
+    document.getElementById("result").innerText = "";
 
     try {
         const res = await fetch("https://corsage-drainable-trimmer.ngrok-free.dev/predict", {
@@ -38,15 +109,20 @@ async function upload() {
 
         const data = await res.json();
 
-        console.log(data);  // 👈 debug
+        document.getElementById("status").innerText = "";
 
-        document.getElementById("result").innerText =
-            "Prediction: " + data.prediction;
+        if (data.prediction === 1.0) {
+            document.getElementById("result").innerText = "🚨 Trash detected outside bin";
+            document.getElementById("result").style.color = "red";
+        } else {
+            document.getElementById("result").innerText = "✅ No issue detected";
+            document.getElementById("result").style.color = "green";
+        }
 
     } catch (err) {
         console.error(err);
-        document.getElementById("result").innerText =
-            "Error occurred";
+        document.getElementById("status").innerText = "";
+        document.getElementById("result").innerText = "❌ Error occurred";
     }
 }
 </script>
