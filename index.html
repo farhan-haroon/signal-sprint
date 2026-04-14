@@ -365,6 +365,7 @@
 
       .preview-section {
         padding: 30px 20px;
+        min-height: auto;
       }
 
       h1 {
@@ -378,22 +379,27 @@
 
       #preview {
         max-width: 100%;
+        margin-bottom: 10px;
       }
 
       .result {
-        padding: 12px 16px;
+        padding: 14px 16px;
         gap: 10px;
         min-height: auto;
+        width: 100%;
+        box-sizing: border-box;
       }
 
       .result svg {
         width: 20px;
         height: 20px;
         min-width: 20px;
+        flex-shrink: 0;
       }
 
       .result-content {
-        gap: 6px;
+        gap: 8px;
+        width: 100%;
       }
 
       .result-title {
@@ -403,14 +409,18 @@
 
       .result-comment {
         font-size: 12px;
-        line-height: 1.4;
+        line-height: 1.5;
         word-wrap: break-word;
         white-space: normal;
+        overflow-wrap: break-word;
+        width: 100%;
       }
 
       .preview-container {
         max-width: 100%;
-        padding: 0 5px;
+        padding: 0;
+        width: 100%;
+        gap: 15px;
       }
 
       .upload-area {
