@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>Inference App</title>
+  <title>Trash Detection</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
   <style>
@@ -21,7 +21,7 @@
       border-radius: 12px;
       box-shadow: 0 10px 25px rgba(0,0,0,0.1);
       width: 90%;
-      max-width: 400px;
+      max-width: 420px;
       text-align: center;
     }
 
@@ -43,6 +43,7 @@
       color: white;
       font-size: 16px;
       cursor: pointer;
+      transition: 0.2s;
     }
 
     button:hover {
@@ -79,7 +80,7 @@
 <div class="container">
   <h2>🧠 Trash Detection</h2>
 
-  <input type="file" id="fileInput">
+  <input type="file" id="fileInput" accept="image/*">
 
   <button onclick="upload()">Run Inference</button>
 
@@ -91,13 +92,21 @@
 
 <script>
 async function upload() {
-    const file = document.getElementById("fileInput").files[0];
-    if (!file) return;
+    const fileInput = document.getElementById("fileInput");
+    const file = fileInput.files[0];
+
+    if (!file) {
+        alert("Please select an image");
+        return;
+    }
 
     const formData = new FormData();
     formData.append("file", file);
 
+    // show preview instantly
     document.getElementById("preview").src = URL.createObjectURL(file);
+
+    // UI state
     document.getElementById("status").innerText = "Processing...";
     document.getElementById("result").innerText = "";
 
@@ -109,13 +118,21 @@ async function upload() {
 
         const data = await res.json();
 
+        // remove loading
         document.getElementById("status").innerText = "";
 
+        // show annotated image (with boxes + mask)
+        document.getElementById("preview").src =
+            "data:image/jpeg;base64," + data.image;
+
+        // result text
         if (data.prediction === 1.0) {
-            document.getElementById("result").innerText = "🚨 Trash detected outside bin";
+            document.getElementById("result").innerText =
+                "🚨 Trash detected outside bin";
             document.getElementById("result").style.color = "red";
         } else {
-            document.getElementById("result").innerText = "✅ No issue detected";
+            document.getElementById("result").innerText =
+                "✅ No issue detected";
             document.getElementById("result").style.color = "green";
         }
 
