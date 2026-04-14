@@ -27,7 +27,7 @@ async def run_inference(file: UploadFile = File(...)):
     with open(tmp.name, "wb") as buffer:
         shutil.copyfileobj(file.file, buffer)
 
-    result, annotated = predict(model, tmp.name, return_image=True)
+    result, annotated, bin_detected = predict(model, tmp.name, return_image=True)
 
     _, buffer = cv2.imencode('.jpg', annotated)
     img_str = base64.b64encode(buffer).decode()
@@ -36,5 +36,6 @@ async def run_inference(file: UploadFile = File(...)):
 
     return {
         "prediction": float(result),
-        "image": img_str
+        "image": img_str,
+        "bin_detected": bool(bin_detected)
     }

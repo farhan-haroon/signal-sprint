@@ -644,33 +644,9 @@ async function upload() {
         // Show annotated image (with boxes + mask)
         previewEl.src = "data:image/jpeg;base64," + data.image;
 
-        // Enhanced result messages based on prediction
-        if (data.prediction === 1.0) {
-            // Trash detected
-            resultEl.className = "result danger show";
-            resultEl.innerHTML = `
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon>
-              </svg>
-              <div class="result-content">
-                <span class="result-title">⚠️ Trash Detected</span>
-                <span class="result-comment">Trash found outside IIT Kanpur dustbin - Immediate attention required</span>
-              </div>
-            `;
-        } else if (data.prediction === 0.0) {
-            // No trash / clean
-            resultEl.className = "result success show";
-            resultEl.innerHTML = `
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <polyline points="20 6 9 17 4 12"></polyline>
-              </svg>
-              <div class="result-content">
-                <span class="result-title">✓ Area is Clean</span>
-                <span class="result-comment">No trash detected - IIT Kanpur dustbin area is properly maintained</span>
-              </div>
-            `;
-        } else if (data.prediction === 0.5) {
-            // Partial trash or uncertainty
+        // Check if IITK dustbin is detected first
+        if (!data.bin_detected) {
+            // No IITK dustbin found - No DMC call needed
             resultEl.className = "result warning show";
             resultEl.innerHTML = `
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -679,20 +655,32 @@ async function upload() {
                 <line x1="12" y1="17" x2="12.01" y2="17"></line>
               </svg>
               <div class="result-content">
-                <span class="result-title">⚡ Partial Detection</span>
-                <span class="result-comment">Possible trash in IIT Kanpur dustbin area - Manual verification recommended</span>
+                <span class="result-title">No IIT Kanpur Dustbin Found</span>
+                <span class="result-comment">No IITK dustbin detected - No DMC call required</span>
+              </div>
+            `;
+        } else if (data.prediction === 1.0) {
+            // IITK dustbin detected and trash found outside
+            resultEl.className = "result danger show";
+            resultEl.innerHTML = `
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon>
+              </svg>
+              <div class="result-content">
+                <span class="result-title">⚠️ Trash Detected Outside Bin</span>
+                <span class="result-comment">IITK dustbin found - Trash outside bin - Immediate DMC attention required</span>
               </div>
             `;
         } else {
-            // Default case
+            // IITK dustbin detected and clean (no trash outside)
             resultEl.className = "result success show";
             resultEl.innerHTML = `
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                 <polyline points="20 6 9 17 4 12"></polyline>
               </svg>
               <div class="result-content">
-                <span class="result-title">✓ Scan Complete</span>
-                <span class="result-comment">IIT Kanpur dustbin area analyzed - No issues detected</span>
+                <span class="result-title">✓ Area is Clean</span>
+                <span class="result-comment">IITK dustbin found - No trash outside - Area properly maintained</span>
               </div>
             `;
         }

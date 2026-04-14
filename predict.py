@@ -76,7 +76,7 @@ def predict(model, image_path, return_image=False):
                             cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0,0,255), 2)
 
     if len(bin_boxes) == 0:
-        return 0.0, annotated
+        return 0.0, annotated, False  # (prediction, annotated_image, bin_detected)
 
     # ---------------- SEGMENTATION ----------------
     seg_results = seg_model(img, conf=0.25)[0]
@@ -111,4 +111,4 @@ def predict(model, image_path, return_image=False):
                 result = 1.0
                 break
 
-    return result, annotated
+    return result, annotated, True  # (prediction, annotated_image, bin_detected)
