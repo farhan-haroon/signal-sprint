@@ -810,24 +810,35 @@
 </div>
 
 <script>
+// Global array to accumulate selected files
+let accumulatedFiles = [];
+
 // Update file name display when files are selected
 document.getElementById("fileInput").addEventListener("change", (e) => {
+    // Add new files to accumulated array
+    const newFiles = Array.from(e.target.files);
+    accumulatedFiles = accumulatedFiles.concat(newFiles);
+    // Clear the input so user can click again to add more
+    e.target.value = '';
     updateFileDisplay();
 });
 
 document.getElementById("folderInput").addEventListener("change", (e) => {
+    // Add folder files to accumulated array
+    const newFiles = Array.from(e.target.files);
+    accumulatedFiles = accumulatedFiles.concat(newFiles);
+    // Clear the input so user can click again if needed
+    e.target.value = '';
     updateFileDisplay();
 });
 
 function updateFileDisplay() {
-    const fileInput = document.getElementById("fileInput");
-    const folderInput = document.getElementById("folderInput");
     const fileNameEl = document.getElementById("fileName");
     
-    const fileCount = fileInput.files.length + folderInput.files.length;
+    const fileCount = accumulatedFiles.length;
     
     if (fileCount > 0) {
-        fileNameEl.textContent = `📁 ${fileCount} file${fileCount !== 1 ? 's' : ''} selected`;
+        fileNameEl.textContent = `📁 ${fileCount} file${fileCount !== 1 ? 's' : ''} selected (click Add Files/Folder to add more)`;
     } else {
         fileNameEl.textContent = "";
     }
@@ -836,6 +847,9 @@ function updateFileDisplay() {
 function clearGallery() {
     const galleryEl = document.getElementById("galleryContainer");
     const fileNameEl = document.getElementById("fileName");
+    
+    // Clear accumulated files array
+    accumulatedFiles = [];
     
     // Clear file inputs
     document.getElementById("fileInput").value = '';
@@ -895,11 +909,8 @@ function getResultHTML(binDetected, prediction) {
 }
 
 async function upload() {
-    const fileInput = document.getElementById("fileInput");
-    const folderInput = document.getElementById("folderInput");
-    
-    // Combine files from both inputs
-    const allFiles = Array.from(fileInput.files).concat(Array.from(folderInput.files));
+    // Use accumulated files array
+    const allFiles = accumulatedFiles;
     
     const statusEl = document.getElementById("status");
     const galleryEl = document.getElementById("galleryContainer");
@@ -1009,9 +1020,10 @@ async function upload() {
 
         statusEl.innerHTML = '';
         
-        // Clear file inputs after processing so user can add more
-        fileInput.value = '';
-        folderInput.value = '';
+        // Clear accumulated files after processing so user can add more
+        accumulatedFiles = [];
+        document.getElementById("fileInput").value = '';
+        document.getElementById("folderInput").value = '';
         updateFileDisplay();
 
     } catch (err) {
@@ -1058,9 +1070,9 @@ uploadLabel.addEventListener("drop", (e) => {
         }
         
         if (allValidImages) {
-            fileInput.files = files;
-            // Trigger change event manually
-            fileInput.dispatchEvent(new Event('change', { bubbles: true }));
+            // Add dropped files to accumulated array
+            accumulatedFiles = accumulatedFiles.concat(Array.from(files));
+            updateFileDisplay();
         }
     }
 });
