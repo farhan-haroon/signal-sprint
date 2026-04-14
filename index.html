@@ -646,7 +646,7 @@ async function upload() {
 
         // Check if IITK dustbin is detected first
         if (!data.bin_detected) {
-            // No IITK dustbin found - No DMC call needed
+            // No IITK dustbin found
             resultEl.className = "result warning show";
             resultEl.innerHTML = `
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -655,7 +655,7 @@ async function upload() {
                 <line x1="12" y1="17" x2="12.01" y2="17"></line>
               </svg>
               <div class="result-content">
-                <span class="result-title">No IIT Kanpur Dustbin Found</span>
+                <span class="result-title">No DMC Call</span>
                 <span class="result-comment">IITK dustbin not detected in the image - Cannot evaluate trash status</span>
               </div>
             `;
@@ -667,8 +667,8 @@ async function upload() {
                 <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon>
               </svg>
               <div class="result-content">
-                <span class="result-title">⚠️ Trash Detected Outside Bin</span>
-                <span class="result-comment">IITK dustbin found - Trash outside bin - Immediate DMC attention required</span>
+                <span class="result-title">DMC Call Required</span>
+                <span class="result-comment">Trash detected outside IITK dustbin - Immediate DMC attention required</span>
               </div>
             `;
         } else {
@@ -679,8 +679,8 @@ async function upload() {
                 <polyline points="20 6 9 17 4 12"></polyline>
               </svg>
               <div class="result-content">
-                <span class="result-title">✓ Area is Clean</span>
-                <span class="result-comment">IITK dustbin found - No trash outside - Area properly maintained</span>
+                <span class="result-title">No DMC Call</span>
+                <span class="result-comment">No trash detected outside IITK dustbin - Area properly maintained</span>
               </div>
             `;
         }
