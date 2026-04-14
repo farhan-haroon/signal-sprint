@@ -153,6 +153,39 @@
       max-width: 280px;
     }
 
+    .gallery-container {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 20px;
+      width: 100%;
+      max-width: 100%;
+      justify-content: center;
+      padding-bottom: 40px;
+    }
+
+    .image-card {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 12px;
+      flex: 1 1 calc(50% - 10px);
+      min-width: 250px;
+      max-width: 350px;
+    }
+
+    .image-card img {
+      width: 100%;
+      border-radius: 8px;
+      box-shadow: 0 10px 40px rgba(0, 0, 0, 0.8);
+      border: 1px solid #222;
+      animation: fadeIn 0.5s ease;
+    }
+
+    .image-card .result {
+      width: 100%;
+      margin-bottom: 0;
+    }
+
     button {
       width: 100%;
       padding: 14px;
@@ -197,22 +230,8 @@
       align-items: center;
       gap: 20px;
       width: 100%;
-      max-width: 500px;
+      max-width: 100%;
       padding-bottom: 40px;
-    }
-
-    #preview {
-      width: 100%;
-      max-width: 500px;
-      border-radius: 8px;
-      box-shadow: 0 10px 40px rgba(0, 0, 0, 0.8);
-      display: none;
-      animation: fadeIn 0.5s ease;
-      border: 1px solid #222;
-    }
-
-    #preview.show {
-      display: block;
     }
 
     .result {
@@ -463,6 +482,17 @@
         max-width: 100px;
         font-size: 11px;
       }
+
+      .gallery-container {
+        gap: 15px;
+        padding-bottom: 30px;
+      }
+
+      .image-card {
+        flex: 1 1 100%;
+        min-width: 100%;
+        max-width: 100%;
+      }
     }
 
     @media (max-width: 480px) {
@@ -587,6 +617,17 @@
         padding-bottom: 30px;
       }
 
+      .gallery-container {
+        gap: 12px;
+        padding-bottom: 30px;
+      }
+
+      .image-card {
+        flex: 1 1 100%;
+        min-width: 100%;
+        max-width: 100%;
+      }
+
       .status-text {
         margin-top: 12px;
         font-size: 11px;
@@ -614,7 +655,7 @@
 
     <div class="upload-area">
       <div class="file-input-wrapper">
-        <input type="file" id="fileInput" accept="image/*" aria-label="Upload image for trash detection">
+        <input type="file" id="fileInput" accept="image/*" multiple aria-label="Upload images for trash detection">
         <label for="fileInput" class="upload-label" role="button" tabindex="0">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
             <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
@@ -623,14 +664,14 @@
           </svg>
           <div class="upload-text">
             Click to upload or drag
-            <span>Select an image</span>
+            <span>Select images</span>
           </div>
         </label>
       </div>
       <div id="fileName" class="file-name"></div>
     </div>
 
-    <button onclick="upload()" id="uploadBtn" aria-label="Run inference on uploaded image">
+    <button onclick="upload()" id="uploadBtn" aria-label="Run inference on uploaded images">
       <svg style="display: inline; width: 18px; height: 18px; margin-right: 8px; vertical-align: middle;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
         <circle cx="12" cy="12" r="10"></circle>
         <polyline points="12 6 12 12 16 14"></polyline>
@@ -643,100 +684,30 @@
 
   <section class="preview-section" aria-labelledby="preview-heading">
     <div class="preview-container">
-      <h2 id="preview-heading" style="display: none;">Detection Result</h2>
-      <img id="preview" alt="Preview and detection result of uploaded image" />
+      <h2 id="preview-heading" style="display: none;">Detection Results</h2>
+      <div id="galleryContainer" class="gallery-container"></div>
       <div id="result" class="result" role="alert" aria-live="polite"></div>
     </div>
   </section>
 </div>
 
 <script>
-// Update file name display when a file is selected
+// Update file name display when files are selected
 document.getElementById("fileInput").addEventListener("change", (e) => {
     const fileNameEl = document.getElementById("fileName");
     if (e.target.files.length > 0) {
-        fileNameEl.textContent = `📄 ${e.target.files[0].name}`;
+        const fileCount = e.target.files.length;
+        fileNameEl.textContent = `📁 ${fileCount} file${fileCount !== 1 ? 's' : ''} selected`;
     } else {
         fileNameEl.textContent = "";
     }
 });
 
-async function upload() {
-    const fileInput = document.getElementById("fileInput");
-    const file = fileInput.files[0];
-    const statusEl = document.getElementById("status");
-    const resultEl = document.getElementById("result");
-    const previewEl = document.getElementById("preview");
-    const uploadBtn = document.getElementById("uploadBtn");
-
-    if (!file) {
-        resultEl.className = "result error show";
-        resultEl.innerHTML = `
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <circle cx="12" cy="12" r="10"></circle>
-            <line x1="12" y1="8" x2="12" y2="12"></line>
-            <line x1="12" y1="16" x2="12.01" y2="16"></line>
-          </svg>
-          <div class="result-content">
-            <span class="result-title">No File Selected</span>
-            <span class="result-comment">Please select an image first</span>
-          </div>
-        `;
-        return;
-    }
-
-    // Validate file is an image
-    if (!file.type.startsWith('image/')) {
-        resultEl.className = "result error show";
-        resultEl.innerHTML = `
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <circle cx="12" cy="12" r="10"></circle>
-            <line x1="12" y1="8" x2="12" y2="12"></line>
-            <line x1="12" y1="16" x2="12.01" y2="16"></line>
-          </svg>
-          <div class="result-content">
-            <span class="result-title">Invalid File Type</span>
-            <span class="result-comment">Please select a valid image file (JPG, PNG, etc.)</span>
-          </div>
-        `;
-        return;
-    }
-
-    const formData = new FormData();
-    formData.append("file", file);
-
-    // Show preview instantly
-    previewEl.src = URL.createObjectURL(file);
-    previewEl.classList.add("show");
-
-    // UI state
-    statusEl.innerHTML = '<span class="loading">⏳ Processing image...</span>';
-    resultEl.classList.remove("show");
-    uploadBtn.disabled = true;
-
-    try {
-        const res = await fetch("https://amusable-corrosive-chunk.ngrok-free.dev/predict", {
-            method: "POST",
-            body: formData
-        });
-
-        if (!res.ok) {
-            throw new Error(`HTTP error! status: ${res.status}`);
-        }
-
-        const data = await res.json();
-
-        // Remove loading
-        statusEl.innerHTML = "";
-
-        // Show annotated image (with boxes + mask)
-        previewEl.src = "data:image/jpeg;base64," + data.image;
-
-        // Check if IITK dustbin is detected first
-        if (!data.bin_detected) {
-            // No IITK dustbin found
-            resultEl.className = "result warning show";
-            resultEl.innerHTML = `
+function getResultHTML(binDetected, prediction) {
+    if (!binDetected) {
+        return {
+            className: "result warning show",
+            html: `
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                 <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3.05h16.94a2 2 0 0 0 1.71-3.05L13.71 3.86a2 2 0 0 0-3.42 0z"></path>
                 <line x1="12" y1="9" x2="12" y2="13"></line>
@@ -744,13 +715,14 @@ async function upload() {
               </svg>
               <div class="result-content">
                 <span class="result-title">No DMC Call</span>
-                <span class="result-comment">IITK dustbin not detected in the image - Cannot evaluate trash status</span>
+                <span class="result-comment">IITK dustbin not detected - Cannot evaluate trash status</span>
               </div>
-            `;
-        } else if (data.prediction === 1.0) {
-            // IITK dustbin detected and trash found outside
-            resultEl.className = "result danger show";
-            resultEl.innerHTML = `
+            `
+        };
+    } else if (prediction === 1.0) {
+        return {
+            className: "result danger show",
+            html: `
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                 <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon>
               </svg>
@@ -758,11 +730,12 @@ async function upload() {
                 <span class="result-title">DMC Call Required</span>
                 <span class="result-comment">Trash detected outside IITK dustbin - Immediate DMC attention required</span>
               </div>
-            `;
-        } else {
-            // IITK dustbin detected and clean (no trash outside)
-            resultEl.className = "result success show";
-            resultEl.innerHTML = `
+            `
+        };
+    } else {
+        return {
+            className: "result success show",
+            html: `
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                 <polyline points="20 6 9 17 4 12"></polyline>
               </svg>
@@ -770,22 +743,137 @@ async function upload() {
                 <span class="result-title">No DMC Call</span>
                 <span class="result-comment">No trash detected outside IITK dustbin - Area properly maintained</span>
               </div>
+            `
+        };
+    }
+}
+
+async function upload() {
+    const fileInput = document.getElementById("fileInput");
+    const files = fileInput.files;
+    const statusEl = document.getElementById("status");
+    const galleryEl = document.getElementById("galleryContainer");
+    const uploadBtn = document.getElementById("uploadBtn");
+
+    if (files.length === 0) {
+        galleryEl.innerHTML = `
+          <div class="result error show" style="width: 100%; max-width: 500px;">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="12" cy="12" r="10"></circle>
+              <line x1="12" y1="8" x2="12" y2="12"></line>
+              <line x1="12" y1="16" x2="12.01" y2="16"></line>
+            </svg>
+            <div class="result-content">
+              <span class="result-title">No Files Selected</span>
+              <span class="result-comment">Please select at least one image</span>
+            </div>
+          </div>
+        `;
+        return;
+    }
+
+    // Validate all files are images
+    for (let file of files) {
+        if (!file.type.startsWith('image/')) {
+            galleryEl.innerHTML = `
+              <div class="result error show" style="width: 100%; max-width: 500px;">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <circle cx="12" cy="12" r="10"></circle>
+                  <line x1="12" y1="8" x2="12" y2="12"></line>
+                  <line x1="12" y1="16" x2="12.01" y2="16"></line>
+                </svg>
+                <div class="result-content">
+                  <span class="result-title">Invalid File Type</span>
+                  <span class="result-comment">Please select valid image files only (JPG, PNG, etc.)</span>
+                </div>
+              </div>
             `;
+            return;
         }
+    }
+
+    // Clear gallery and show loading
+    galleryEl.innerHTML = '';
+    statusEl.innerHTML = `<span class="loading">⏳ Processing ${files.length} image${files.length !== 1 ? 's' : ''}...</span>`;
+    uploadBtn.disabled = true;
+
+    try {
+        // Process each image
+        for (let file of files) {
+            const formData = new FormData();
+            formData.append("file", file);
+
+            try {
+                const res = await fetch("https://amusable-corrosive-chunk.ngrok-free.dev/predict", {
+                    method: "POST",
+                    body: formData
+                });
+
+                if (!res.ok) {
+                    throw new Error(`HTTP error! status: ${res.status}`);
+                }
+
+                const data = await res.json();
+
+                // Create image card with result
+                const imageCard = document.createElement("div");
+                imageCard.className = "image-card";
+
+                const img = document.createElement("img");
+                img.src = "data:image/jpeg;base64," + data.image;
+                img.alt = file.name;
+
+                const resultDiv = document.createElement("div");
+                const resultData = getResultHTML(data.bin_detected, data.prediction);
+                resultDiv.className = resultData.className;
+                resultDiv.innerHTML = resultData.html;
+
+                imageCard.appendChild(img);
+                imageCard.appendChild(resultDiv);
+                galleryEl.appendChild(imageCard);
+
+            } catch (err) {
+                console.error(err);
+                
+                // Add error card
+                const imageCard = document.createElement("div");
+                imageCard.className = "image-card";
+
+                const errorDiv = document.createElement("div");
+                errorDiv.className = "result error show";
+                errorDiv.style.width = "100%";
+                errorDiv.innerHTML = `
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <circle cx="12" cy="12" r="10"></circle>
+                    <line x1="15" y1="9" x2="9" y2="15"></line>
+                    <line x1="9" y1="9" x2="15" y2="15"></line>
+                  </svg>
+                  <div class="result-content">
+                    <span class="result-title">Error</span>
+                    <span class="result-comment">Failed to process ${file.name}</span>
+                  </div>
+                `;
+                imageCard.appendChild(errorDiv);
+                galleryEl.appendChild(imageCard);
+            }
+        }
+
+        statusEl.innerHTML = '';
 
     } catch (err) {
         console.error(err);
         statusEl.innerHTML = "";
-        resultEl.className = "result error show";
-        resultEl.innerHTML = `
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <circle cx="12" cy="12" r="10"></circle>
-            <line x1="15" y1="9" x2="9" y2="15"></line>
-            <line x1="9" y1="9" x2="15" y2="15"></line>
-          </svg>
-          <div class="result-content">
-            <span class="result-title">Error</span>
-            <span class="result-comment">Failed to process image - Please check connection and try again</span>
+        galleryEl.innerHTML = `
+          <div class="result error show" style="width: 100%; max-width: 500px;">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="12" cy="12" r="10"></circle>
+              <line x1="15" y1="9" x2="9" y2="15"></line>
+              <line x1="9" y1="9" x2="15" y2="15"></line>
+            </svg>
+            <div class="result-content">
+              <span class="result-title">Error</span>
+              <span class="result-comment">Failed to process images - Please check connection and try again</span>
+            </div>
           </div>
         `;
     } finally {
@@ -819,8 +907,16 @@ uploadLabel.addEventListener("drop", (e) => {
     
     const files = e.dataTransfer.files;
     if (files.length > 0) {
-        // Validate file is an image
-        if (files[0].type.startsWith('image/')) {
+        // Check if all files are images
+        let allValidImages = true;
+        for (let file of files) {
+            if (!file.type.startsWith('image/')) {
+                allValidImages = false;
+                break;
+            }
+        }
+        
+        if (allValidImages) {
             fileInput.files = files;
             // Trigger change event manually
             fileInput.dispatchEvent(new Event('change', { bubbles: true }));
