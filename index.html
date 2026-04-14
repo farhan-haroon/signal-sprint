@@ -247,10 +247,35 @@
       border: 1px solid #F44336;
     }
 
+    .result.warning {
+      background: rgba(255, 152, 0, 0.1);
+      color: #FF9800;
+      border: 1px solid #FF9800;
+    }
+
     .result.error {
       background: rgba(255, 152, 0, 0.1);
       color: #FF9800;
       border: 1px solid #FF9800;
+    }
+
+    .result-content {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 8px;
+      text-align: center;
+    }
+
+    .result-title {
+      font-weight: 600;
+      font-size: 16px;
+    }
+
+    .result-comment {
+      font-size: 13px;
+      opacity: 0.9;
+      font-weight: 300;
     }
 
     .loading {
@@ -430,7 +455,10 @@ async function upload() {
             <line x1="12" y1="8" x2="12" y2="12"></line>
             <line x1="12" y1="16" x2="12.01" y2="16"></line>
           </svg>
-          <span>Please select an image</span>
+          <div class="result-content">
+            <span class="result-title">No File Selected</span>
+            <span class="result-comment">Please select an image first</span>
+          </div>
         `;
         return;
     }
@@ -444,7 +472,10 @@ async function upload() {
             <line x1="12" y1="8" x2="12" y2="12"></line>
             <line x1="12" y1="16" x2="12.01" y2="16"></line>
           </svg>
-          <span>Please select a valid image file</span>
+          <div class="result-content">
+            <span class="result-title">Invalid File Type</span>
+            <span class="result-comment">Please select a valid image file (JPG, PNG, etc.)</span>
+          </div>
         `;
         return;
     }
@@ -479,22 +510,56 @@ async function upload() {
         // Show annotated image (with boxes + mask)
         previewEl.src = "data:image/jpeg;base64," + data.image;
 
-        // Result text with icons
+        // Enhanced result messages based on prediction
         if (data.prediction === 1.0) {
+            // Trash detected
             resultEl.className = "result danger show";
             resultEl.innerHTML = `
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                 <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon>
               </svg>
-              <span>Trash detected outside bin</span>
+              <div class="result-content">
+                <span class="result-title">⚠️ Trash Detected</span>
+                <span class="result-comment">Trash found outside IIT Kanpur dustbin - Immediate attention required</span>
+              </div>
             `;
-        } else {
+        } else if (data.prediction === 0.0) {
+            // No trash / clean
             resultEl.className = "result success show";
             resultEl.innerHTML = `
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                 <polyline points="20 6 9 17 4 12"></polyline>
               </svg>
-              <span>No issue detected</span>
+              <div class="result-content">
+                <span class="result-title">✓ Area is Clean</span>
+                <span class="result-comment">No trash detected - IIT Kanpur dustbin area is properly maintained</span>
+              </div>
+            `;
+        } else if (data.prediction === 0.5) {
+            // Partial trash or uncertainty
+            resultEl.className = "result warning show";
+            resultEl.innerHTML = `
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3.05h16.94a2 2 0 0 0 1.71-3.05L13.71 3.86a2 2 0 0 0-3.42 0z"></path>
+                <line x1="12" y1="9" x2="12" y2="13"></line>
+                <line x1="12" y1="17" x2="12.01" y2="17"></line>
+              </svg>
+              <div class="result-content">
+                <span class="result-title">⚡ Partial Detection</span>
+                <span class="result-comment">Possible trash in IIT Kanpur dustbin area - Manual verification recommended</span>
+              </div>
+            `;
+        } else {
+            // Default case
+            resultEl.className = "result success show";
+            resultEl.innerHTML = `
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <polyline points="20 6 9 17 4 12"></polyline>
+              </svg>
+              <div class="result-content">
+                <span class="result-title">✓ Scan Complete</span>
+                <span class="result-comment">IIT Kanpur dustbin area analyzed - No issues detected</span>
+              </div>
             `;
         }
 
@@ -508,7 +573,10 @@ async function upload() {
             <line x1="15" y1="9" x2="9" y2="15"></line>
             <line x1="9" y1="9" x2="15" y2="15"></line>
           </svg>
-          <span>Error occurred. Please try again.</span>
+          <div class="result-content">
+            <span class="result-title">Error</span>
+            <span class="result-comment">Failed to process image - Please check connection and try again</span>
+          </div>
         `;
     } finally {
         uploadBtn.disabled = false;
