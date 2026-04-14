@@ -153,6 +153,61 @@
       max-width: 280px;
     }
 
+    .upload-buttons {
+      display: flex;
+      gap: 12px;
+      width: 100%;
+      margin-top: 15px;
+    }
+
+    .upload-buttons button {
+      flex: 1;
+      margin: 0;
+      animation: fadeInUp 0.6s ease 0.2s both;
+    }
+
+    .button-group {
+      display: flex;
+      gap: 10px;
+      width: 100%;
+    }
+
+    .button-group button {
+      flex: 1;
+      margin: 0;
+    }
+
+    .upload-buttons {
+      display: flex;
+      gap: 12px;
+      width: 100%;
+      margin-top: 15px;
+    }
+
+    .upload-buttons button {
+      flex: 1;
+      margin: 0;
+      animation: fadeInUp 0.6s ease 0.2s both;
+    }
+
+    .buttons-container {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      width: 100%;
+    }
+
+    .button-group {
+      display: flex;
+      gap: 10px;
+      width: 100%;
+    }
+
+    .button-group button {
+      flex: 1;
+      margin: 0;
+    }
+
     .gallery-container {
       display: flex;
       flex-wrap: wrap;
@@ -483,17 +538,45 @@
         font-size: 11px;
       }
 
-      .gallery-container {
-        gap: 15px;
-        padding-bottom: 30px;
+      .upload-buttons {
+        flex-direction: column;
       }
 
-      .image-card {
-        flex: 1 1 100%;
-        min-width: 100%;
-        max-width: 100%;
+      .upload-buttons button {
+        width: 100%;
       }
-    }
+
+      .button-group {
+        flex-direction: column;
+      }
+
+      .button-group button {
+        width: 100%;
+      }
+
+      .button-group {
+        flex-direction: column;
+      }
+
+      .button-group button {
+        width: 100%;
+      }
+
+      .upload-buttons {
+        flex-direction: column;
+      }
+
+      .upload-buttons button {
+        width: 100%;
+      }
+
+      .button-group {
+        flex-direction: column;
+      }
+
+      .button-group button {
+        width: 100%;
+      }
 
     @media (max-width: 480px) {
       body {
@@ -637,6 +720,26 @@
         max-width: 90px;
         font-size: 10px;
       }
+
+      .upload-buttons {
+        flex-direction: column;
+      }
+
+      .upload-buttons button {
+        width: 100%;
+        padding: 10px;
+        font-size: 12px;
+      }
+
+      .button-group {
+        flex-direction: column;
+      }
+
+      .button-group button {
+        width: 100%;
+        padding: 10px;
+        font-size: 12px;
+      }
     }
   </style>
 </head>
@@ -668,16 +771,31 @@
           </div>
         </label>
       </div>
+      <input type="file" id="folderInput" webkitdirectory directory multiple hidden aria-label="Upload folder">
       <div id="fileName" class="file-name"></div>
     </div>
 
-    <button onclick="upload()" id="uploadBtn" aria-label="Run inference on uploaded images">
-      <svg style="display: inline; width: 18px; height: 18px; margin-right: 8px; vertical-align: middle;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-        <circle cx="12" cy="12" r="10"></circle>
-        <polyline points="12 6 12 12 16 14"></polyline>
-      </svg>
-      Run Inference
-    </button>
+    <div class="upload-buttons">
+      <button onclick="document.getElementById('fileInput').click()" aria-label="Browse and select images">
+        📁 Add Files
+      </button>
+      <button onclick="document.getElementById('folderInput').click()" aria-label="Browse and select folder">
+        📂 Add Folder
+      </button>
+    </div>
+
+    <div class="button-group">
+      <button onclick="upload()" id="uploadBtn" aria-label="Run inference on uploaded images">
+        <svg style="display: inline; width: 18px; height: 18px; margin-right: 8px; vertical-align: middle;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <circle cx="12" cy="12" r="10"></circle>
+          <polyline points="12 6 12 12 16 14"></polyline>
+        </svg>
+        Run Inference
+      </button>
+      <button onclick="clearGallery()" id="clearBtn" style="border-color: #ff6b6b; color: #ff6b6b;" aria-label="Clear all results">
+        Clear All
+      </button>
+    </div>
 
     <p id="status" class="status-text" role="status" aria-live="polite"></p>
   </section>
@@ -694,14 +812,42 @@
 <script>
 // Update file name display when files are selected
 document.getElementById("fileInput").addEventListener("change", (e) => {
+    updateFileDisplay();
+});
+
+document.getElementById("folderInput").addEventListener("change", (e) => {
+    updateFileDisplay();
+});
+
+function updateFileDisplay() {
+    const fileInput = document.getElementById("fileInput");
+    const folderInput = document.getElementById("folderInput");
     const fileNameEl = document.getElementById("fileName");
-    if (e.target.files.length > 0) {
-        const fileCount = e.target.files.length;
+    
+    const fileCount = fileInput.files.length + folderInput.files.length;
+    
+    if (fileCount > 0) {
         fileNameEl.textContent = `📁 ${fileCount} file${fileCount !== 1 ? 's' : ''} selected`;
     } else {
         fileNameEl.textContent = "";
     }
-});
+}
+
+function clearGallery() {
+    const galleryEl = document.getElementById("galleryContainer");
+    const fileNameEl = document.getElementById("fileName");
+    
+    // Clear file inputs
+    document.getElementById("fileInput").value = '';
+    document.getElementById("folderInput").value = '';
+    
+    // Clear display
+    galleryEl.innerHTML = '';
+    fileNameEl.textContent = '';
+    document.getElementById("status").innerHTML = '';
+    
+    updateFileDisplay();
+}
 
 function getResultHTML(binDetected, prediction) {
     if (!binDetected) {
@@ -750,13 +896,17 @@ function getResultHTML(binDetected, prediction) {
 
 async function upload() {
     const fileInput = document.getElementById("fileInput");
-    const files = fileInput.files;
+    const folderInput = document.getElementById("folderInput");
+    
+    // Combine files from both inputs
+    const allFiles = Array.from(fileInput.files).concat(Array.from(folderInput.files));
+    
     const statusEl = document.getElementById("status");
     const galleryEl = document.getElementById("galleryContainer");
     const uploadBtn = document.getElementById("uploadBtn");
 
-    if (files.length === 0) {
-        galleryEl.innerHTML = `
+    if (allFiles.length === 0) {
+        statusEl.innerHTML = `
           <div class="result error show" style="width: 100%; max-width: 500px;">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
               <circle cx="12" cy="12" r="10"></circle>
@@ -773,9 +923,9 @@ async function upload() {
     }
 
     // Validate all files are images
-    for (let file of files) {
+    for (let file of allFiles) {
         if (!file.type.startsWith('image/')) {
-            galleryEl.innerHTML = `
+            statusEl.innerHTML = `
               <div class="result error show" style="width: 100%; max-width: 500px;">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                   <circle cx="12" cy="12" r="10"></circle>
@@ -792,14 +942,13 @@ async function upload() {
         }
     }
 
-    // Clear gallery and show loading
-    galleryEl.innerHTML = '';
-    statusEl.innerHTML = `<span class="loading">⏳ Processing ${files.length} image${files.length !== 1 ? 's' : ''}...</span>`;
+    // Show loading
+    statusEl.innerHTML = `<span class="loading">⏳ Processing ${allFiles.length} image${allFiles.length !== 1 ? 's' : ''}...</span>`;
     uploadBtn.disabled = true;
 
     try {
         // Process each image
-        for (let file of files) {
+        for (let file of allFiles) {
             const formData = new FormData();
             formData.append("file", file);
 
@@ -859,23 +1008,15 @@ async function upload() {
         }
 
         statusEl.innerHTML = '';
+        
+        // Clear file inputs after processing so user can add more
+        fileInput.value = '';
+        folderInput.value = '';
+        updateFileDisplay();
 
     } catch (err) {
         console.error(err);
         statusEl.innerHTML = "";
-        galleryEl.innerHTML = `
-          <div class="result error show" style="width: 100%; max-width: 500px;">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <circle cx="12" cy="12" r="10"></circle>
-              <line x1="15" y1="9" x2="9" y2="15"></line>
-              <line x1="9" y1="9" x2="15" y2="15"></line>
-            </svg>
-            <div class="result-content">
-              <span class="result-title">Error</span>
-              <span class="result-comment">Failed to process images - Please check connection and try again</span>
-            </div>
-          </div>
-        `;
     } finally {
         uploadBtn.disabled = false;
     }
