@@ -1,8 +1,10 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-  <title>Trash Detection</title>
+  <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Intelligent trash detection system that identifies trash outside waste bins using computer vision.">
+  <title>Trash Detection - AI-Powered Detection System</title>
 
   <style>
     * {
@@ -140,12 +142,20 @@
       margin-top: 4px;
     }
 
+    .file-name {
+      font-size: 12px;
+      color: #4CAF50;
+      margin-top: 8px;
+      word-break: break-all;
+      max-width: 280px;
+    }
+
     button {
       width: 100%;
       padding: 14px;
       border: 1px solid #333;
       border-radius: 8px;
-      background: transparent;
+      background: linear-gradient(135deg, #1a1a1a 0%, #0d0d0d 100%);
       color: #888;
       font-size: 15px;
       font-weight: 400;
@@ -155,13 +165,14 @@
       animation: fadeInUp 0.6s ease 0.2s both;
     }
 
-    button:hover {
-      border-color: #555;
-      color: #bbb;
+    button:hover:not(:disabled) {
+      border-color: #4CAF50;
+      color: #4CAF50;
+      box-shadow: 0 0 20px rgba(76, 175, 80, 0.2);
       transform: none;
     }
 
-    button:active {
+    button:active:not(:disabled) {
       transform: none;
     }
 
@@ -225,21 +236,21 @@
     }
 
     .result.success {
-      background: transparent;
-      color: #666;
-      border: 1px solid #333;
+      background: rgba(76, 175, 80, 0.1);
+      color: #4CAF50;
+      border: 1px solid #4CAF50;
     }
 
     .result.danger {
-      background: transparent;
-      color: #666;
-      border: 1px solid #333;
+      background: rgba(244, 67, 54, 0.1);
+      color: #F44336;
+      border: 1px solid #F44336;
     }
 
     .result.error {
-      background: transparent;
-      color: #666;
-      border: 1px solid #333;
+      background: rgba(255, 152, 0, 0.1);
+      color: #FF9800;
+      border: 1px solid #FF9800;
     }
 
     .loading {
@@ -344,21 +355,21 @@
 
 <body>
 
-<div class="container">
-  <div class="upload-section">
-    <div class="header">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+<div class="container" role="main">
+  <section class="upload-section" aria-labelledby="upload-heading">
+    <header class="header">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
         <path d="M12 2c5.523 0 10 4.477 10 10s-4.477 10-10 10S2 17.523 2 12 6.477 2 12 2z"></path>
         <path d="M12 6v12M6 12h12" stroke="#4CAF50"></path>
       </svg>
-      <h1>Trash Detection</h1>
-    </div>
+      <h1 id="upload-heading">Trash Detection</h1>
+    </header>
 
     <div class="upload-area">
       <div class="file-input-wrapper">
-        <input type="file" id="fileInput" accept="image/*">
-        <label for="fileInput" class="upload-label">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <input type="file" id="fileInput" accept="image/*" aria-label="Upload image for trash detection">
+        <label for="fileInput" class="upload-label" role="button" tabindex="0">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
             <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
             <polyline points="17 8 12 3 7 8"></polyline>
             <line x1="12" y1="3" x2="12" y2="15"></line>
@@ -369,28 +380,40 @@
           </div>
         </label>
       </div>
+      <div id="fileName" class="file-name"></div>
     </div>
 
-    <button onclick="upload()" id="uploadBtn">
-      <svg style="display: inline; width: 18px; height: 18px; margin-right: 8px; vertical-align: middle;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+    <button onclick="upload()" id="uploadBtn" aria-label="Run inference on uploaded image">
+      <svg style="display: inline; width: 18px; height: 18px; margin-right: 8px; vertical-align: middle;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
         <circle cx="12" cy="12" r="10"></circle>
         <polyline points="12 6 12 12 16 14"></polyline>
       </svg>
       Run Inference
     </button>
 
-    <p id="status" class="status-text"></p>
-  </div>
+    <p id="status" class="status-text" role="status" aria-live="polite"></p>
+  </section>
 
-  <div class="preview-section">
+  <section class="preview-section" aria-labelledby="preview-heading">
     <div class="preview-container">
-      <img id="preview"/>
-      <div id="result" class="result"></div>
+      <h2 id="preview-heading" style="display: none;">Detection Result</h2>
+      <img id="preview" alt="Preview and detection result of uploaded image" />
+      <div id="result" class="result" role="alert" aria-live="polite"></div>
     </div>
-  </div>
+  </section>
 </div>
 
 <script>
+// Update file name display when a file is selected
+document.getElementById("fileInput").addEventListener("change", (e) => {
+    const fileNameEl = document.getElementById("fileName");
+    if (e.target.files.length > 0) {
+        fileNameEl.textContent = `📄 ${e.target.files[0].name}`;
+    } else {
+        fileNameEl.textContent = "";
+    }
+});
+
 async function upload() {
     const fileInput = document.getElementById("fileInput");
     const file = fileInput.files[0];
@@ -407,7 +430,21 @@ async function upload() {
             <line x1="12" y1="8" x2="12" y2="12"></line>
             <line x1="12" y1="16" x2="12.01" y2="16"></line>
           </svg>
-          Please select an image
+          <span>Please select an image</span>
+        `;
+        return;
+    }
+
+    // Validate file is an image
+    if (!file.type.startsWith('image/')) {
+        resultEl.className = "result error show";
+        resultEl.innerHTML = `
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="10"></circle>
+            <line x1="12" y1="8" x2="12" y2="12"></line>
+            <line x1="12" y1="16" x2="12.01" y2="16"></line>
+          </svg>
+          <span>Please select a valid image file</span>
         `;
         return;
     }
@@ -429,6 +466,10 @@ async function upload() {
             method: "POST",
             body: formData
         });
+
+        if (!res.ok) {
+            throw new Error(`HTTP error! status: ${res.status}`);
+        }
 
         const data = await res.json();
 
@@ -480,23 +521,40 @@ const uploadLabel = document.querySelector(".upload-label");
 
 uploadLabel.addEventListener("dragover", (e) => {
     e.preventDefault();
+    e.stopPropagation();
     uploadLabel.style.borderColor = "rgba(76, 175, 80, 0.8)";
     uploadLabel.style.background = "rgba(76, 175, 80, 0.15)";
 });
 
-uploadLabel.addEventListener("dragleave", () => {
+uploadLabel.addEventListener("dragleave", (e) => {
+    e.preventDefault();
+    e.stopPropagation();
     uploadLabel.style.borderColor = "rgba(255, 255, 255, 0.3)";
     uploadLabel.style.background = "rgba(76, 175, 80, 0.05)";
 });
 
 uploadLabel.addEventListener("drop", (e) => {
     e.preventDefault();
+    e.stopPropagation();
     uploadLabel.style.borderColor = "rgba(255, 255, 255, 0.3)";
     uploadLabel.style.background = "rgba(76, 175, 80, 0.05)";
     
     const files = e.dataTransfer.files;
     if (files.length > 0) {
-        fileInput.files = files;
+        // Validate file is an image
+        if (files[0].type.startsWith('image/')) {
+            fileInput.files = files;
+            // Trigger change event manually
+            fileInput.dispatchEvent(new Event('change', { bubbles: true }));
+        }
+    }
+});
+
+// Allow spacebar and enter to activate upload label
+uploadLabel.addEventListener("keydown", (e) => {
+    if (e.key === " " || e.key === "Enter") {
+        e.preventDefault();
+        fileInput.click();
     }
 });
 </script>

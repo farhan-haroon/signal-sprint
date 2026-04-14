@@ -51,7 +51,7 @@ def predict(model, image_path, return_image=False):
     annotated = img.copy()
 
     # ---------------- DETECTION ----------------
-    det_results = det_model(img, conf=0.25)[0]
+    det_results = det_model(img, conf=0.45)[0]
 
     bin_boxes = []
     trash_boxes = []
