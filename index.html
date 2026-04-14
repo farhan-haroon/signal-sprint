@@ -13,8 +13,8 @@
 
     body {
       font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', sans-serif;
-      background: linear-gradient(135deg, #0a0e27 0%, #16213e 100%);
-      color: #e0e0e0;
+      background: #0d0d0d;
+      color: #999;
       min-height: 100vh;
       display: flex;
       justify-content: center;
@@ -28,7 +28,7 @@
       display: grid;
       grid-template-columns: 1fr 1fr;
       gap: 0;
-      background: linear-gradient(135deg, #0a0e27 0%, #16213e 100%);
+      background: #0d0d0d;
       overflow: hidden;
     }
 
@@ -38,7 +38,7 @@
       justify-content: center;
       align-items: center;
       padding: 60px 40px;
-      border-right: 1px solid rgba(255, 255, 255, 0.1);
+      border-right: 1px solid #222;
     }
 
     .preview-section {
@@ -47,7 +47,7 @@
       justify-content: center;
       align-items: center;
       padding: 60px 40px;
-      background: rgba(0, 0, 0, 0.3);
+      background: #111;
     }
 
     .header {
@@ -61,13 +61,14 @@
     .header svg {
       width: 32px;
       height: 32px;
-      filter: drop-shadow(0 0 10px rgba(76, 175, 80, 0.4));
+      color: #666;
     }
 
     h1 {
       font-size: 28px;
-      font-weight: 600;
-      letter-spacing: 0.5px;
+      font-weight: 400;
+      letter-spacing: 1px;
+      color: #888;
     }
 
     .upload-area {
@@ -101,78 +102,78 @@
       justify-content: center;
       gap: 12px;
       padding: 40px;
-      border: 2px dashed rgba(255, 255, 255, 0.3);
-      border-radius: 12px;
+      border: 1px solid #333;
+      border-radius: 8px;
       transition: all 0.3s ease;
       cursor: pointer;
-      background: rgba(76, 175, 80, 0.05);
+      background: transparent;
     }
 
     .upload-label:hover {
-      border-color: rgba(76, 175, 80, 0.6);
-      background: rgba(76, 175, 80, 0.1);
-      transform: translateY(-2px);
+      border-color: #555;
+      background: transparent;
+      transform: none;
     }
 
     .upload-label svg {
       width: 40px;
       height: 40px;
-      color: #4CAF50;
-      transition: transform 0.3s ease;
+      color: #666;
+      transition: color 0.3s ease;
     }
 
     .upload-label:hover svg {
-      transform: scale(1.1);
+      color: #888;
+      transform: none;
     }
 
     .upload-text {
       text-align: center;
       font-size: 14px;
-      color: #b0b0b0;
+      color: #666;
     }
 
     .upload-text span {
       display: block;
-      color: #4CAF50;
-      font-weight: 600;
+      color: #666;
+      font-weight: 400;
       margin-top: 4px;
     }
 
     button {
       width: 100%;
       padding: 14px;
-      border: none;
+      border: 1px solid #333;
       border-radius: 8px;
-      background: linear-gradient(135deg, #4CAF50 0%, #45a049 100%);
-      color: white;
+      background: transparent;
+      color: #888;
       font-size: 15px;
-      font-weight: 600;
+      font-weight: 400;
       cursor: pointer;
       transition: all 0.3s ease;
       letter-spacing: 0.5px;
       animation: fadeInUp 0.6s ease 0.2s both;
-      box-shadow: 0 8px 20px rgba(76, 175, 80, 0.2);
     }
 
     button:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 12px 30px rgba(76, 175, 80, 0.4);
+      border-color: #555;
+      color: #bbb;
+      transform: none;
     }
 
     button:active {
-      transform: translateY(0);
+      transform: none;
     }
 
     button:disabled {
-      opacity: 0.6;
+      opacity: 0.5;
       cursor: not-allowed;
-      transform: none;
     }
 
     .status-text {
       margin-top: 20px;
       font-size: 14px;
-      color: #4CAF50;
+      color: #666;
       animation: fadeInUp 0.6s ease 0.3s both;
     }
 
@@ -188,11 +189,11 @@
     #preview {
       width: 100%;
       max-width: 500px;
-      border-radius: 12px;
-      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+      border-radius: 8px;
+      box-shadow: 0 10px 40px rgba(0, 0, 0, 0.8);
       display: none;
       animation: fadeIn 0.5s ease;
-      border: 1px solid rgba(255, 255, 255, 0.1);
+      border: 1px solid #222;
     }
 
     #preview.show {
@@ -206,7 +207,7 @@
       padding: 16px 20px;
       border-radius: 8px;
       font-size: 16px;
-      font-weight: 600;
+      font-weight: 400;
       text-align: center;
       opacity: 0;
       transition: all 0.3s ease;
@@ -224,26 +225,26 @@
     }
 
     .result.success {
-      background: rgba(76, 175, 80, 0.15);
-      color: #4CAF50;
-      border: 1px solid rgba(76, 175, 80, 0.3);
+      background: transparent;
+      color: #666;
+      border: 1px solid #333;
     }
 
     .result.danger {
-      background: rgba(244, 67, 54, 0.15);
-      color: #f44336;
-      border: 1px solid rgba(244, 67, 54, 0.3);
+      background: transparent;
+      color: #666;
+      border: 1px solid #333;
     }
 
     .result.error {
-      background: rgba(255, 152, 0, 0.15);
-      color: #ff9800;
-      border: 1px solid rgba(255, 152, 0, 0.3);
+      background: transparent;
+      color: #666;
+      border: 1px solid #333;
     }
 
     .loading {
       font-size: 14px;
-      color: #4CAF50;
+      color: #666;
       animation: pulse 1.5s ease-in-out infinite;
     }
 
