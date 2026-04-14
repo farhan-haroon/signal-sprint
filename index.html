@@ -5,71 +5,337 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
   <style>
-    body {
-      font-family: Arial, sans-serif;
-      background: #f5f7fb;
+    * {
       margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', sans-serif;
+      background: linear-gradient(135deg, #0a0e27 0%, #16213e 100%);
+      color: #e0e0e0;
+      min-height: 100vh;
       display: flex;
       justify-content: center;
       align-items: center;
-      min-height: 100vh;
+      overflow: hidden;
     }
 
     .container {
-      background: white;
-      padding: 25px;
-      border-radius: 12px;
-      box-shadow: 0 10px 25px rgba(0,0,0,0.1);
-      width: 90%;
-      max-width: 420px;
-      text-align: center;
-    }
-
-    h2 {
-      margin-bottom: 15px;
-    }
-
-    input {
       width: 100%;
-      margin: 10px 0;
+      height: 100vh;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 0;
+      background: linear-gradient(135deg, #0a0e27 0%, #16213e 100%);
+      overflow: hidden;
+    }
+
+    .upload-section {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      padding: 60px 40px;
+      border-right: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .preview-section {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      padding: 60px 40px;
+      background: rgba(0, 0, 0, 0.3);
+    }
+
+    .header {
+      display: flex;
+      align-items: center;
+      gap: 15px;
+      margin-bottom: 40px;
+      animation: fadeInDown 0.6s ease;
+    }
+
+    .header svg {
+      width: 32px;
+      height: 32px;
+      filter: drop-shadow(0 0 10px rgba(76, 175, 80, 0.4));
+    }
+
+    h1 {
+      font-size: 28px;
+      font-weight: 600;
+      letter-spacing: 0.5px;
+    }
+
+    .upload-area {
+      position: relative;
+      width: 100%;
+      max-width: 300px;
+      margin-bottom: 30px;
+      animation: fadeInUp 0.6s ease 0.1s both;
+    }
+
+    .file-input-wrapper {
+      position: relative;
+      overflow: hidden;
+    }
+
+    #fileInput {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      opacity: 0;
+      cursor: pointer;
+      z-index: 2;
+    }
+
+    .upload-label {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+      padding: 40px;
+      border: 2px dashed rgba(255, 255, 255, 0.3);
+      border-radius: 12px;
+      transition: all 0.3s ease;
+      cursor: pointer;
+      background: rgba(76, 175, 80, 0.05);
+    }
+
+    .upload-label:hover {
+      border-color: rgba(76, 175, 80, 0.6);
+      background: rgba(76, 175, 80, 0.1);
+      transform: translateY(-2px);
+    }
+
+    .upload-label svg {
+      width: 40px;
+      height: 40px;
+      color: #4CAF50;
+      transition: transform 0.3s ease;
+    }
+
+    .upload-label:hover svg {
+      transform: scale(1.1);
+    }
+
+    .upload-text {
+      text-align: center;
+      font-size: 14px;
+      color: #b0b0b0;
+    }
+
+    .upload-text span {
+      display: block;
+      color: #4CAF50;
+      font-weight: 600;
+      margin-top: 4px;
     }
 
     button {
       width: 100%;
-      padding: 12px;
+      padding: 14px;
       border: none;
       border-radius: 8px;
-      background: #4CAF50;
+      background: linear-gradient(135deg, #4CAF50 0%, #45a049 100%);
       color: white;
-      font-size: 16px;
+      font-size: 15px;
+      font-weight: 600;
       cursor: pointer;
-      transition: 0.2s;
+      transition: all 0.3s ease;
+      letter-spacing: 0.5px;
+      animation: fadeInUp 0.6s ease 0.2s both;
+      box-shadow: 0 8px 20px rgba(76, 175, 80, 0.2);
     }
 
     button:hover {
-      background: #45a049;
+      transform: translateY(-2px);
+      box-shadow: 0 12px 30px rgba(76, 175, 80, 0.4);
     }
 
-    img {
+    button:active {
+      transform: translateY(0);
+    }
+
+    button:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+      transform: none;
+    }
+
+    .status-text {
+      margin-top: 20px;
+      font-size: 14px;
+      color: #4CAF50;
+      animation: fadeInUp 0.6s ease 0.3s both;
+    }
+
+    .preview-container {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 20px;
       width: 100%;
-      border-radius: 8px;
-      margin-top: 15px;
+      max-width: 500px;
+    }
+
+    #preview {
+      width: 100%;
+      max-width: 500px;
+      border-radius: 12px;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+      display: none;
+      animation: fadeIn 0.5s ease;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    #preview.show {
+      display: block;
     }
 
     .result {
-      margin-top: 15px;
-      font-size: 18px;
-      font-weight: bold;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 16px 20px;
+      border-radius: 8px;
+      font-size: 16px;
+      font-weight: 600;
+      text-align: center;
+      opacity: 0;
+      transition: all 0.3s ease;
+    }
+
+    .result.show {
+      opacity: 1;
+      animation: slideIn 0.4s ease;
+    }
+
+    .result svg {
+      width: 24px;
+      height: 24px;
+      flex-shrink: 0;
+    }
+
+    .result.success {
+      background: rgba(76, 175, 80, 0.15);
+      color: #4CAF50;
+      border: 1px solid rgba(76, 175, 80, 0.3);
+    }
+
+    .result.danger {
+      background: rgba(244, 67, 54, 0.15);
+      color: #f44336;
+      border: 1px solid rgba(244, 67, 54, 0.3);
+    }
+
+    .result.error {
+      background: rgba(255, 152, 0, 0.15);
+      color: #ff9800;
+      border: 1px solid rgba(255, 152, 0, 0.3);
     }
 
     .loading {
-      color: #888;
       font-size: 14px;
+      color: #4CAF50;
+      animation: pulse 1.5s ease-in-out infinite;
     }
 
-    @media (max-width: 480px) {
+    @keyframes fadeInDown {
+      from {
+        opacity: 0;
+        transform: translateY(-20px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    @keyframes fadeInUp {
+      from {
+        opacity: 0;
+        transform: translateY(20px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+      }
+      to {
+        opacity: 1;
+      }
+    }
+
+    @keyframes slideIn {
+      from {
+        opacity: 0;
+        transform: translateY(10px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    @keyframes pulse {
+      0%, 100% {
+        opacity: 1;
+      }
+      50% {
+        opacity: 0.6;
+      }
+    }
+
+    @media (max-width: 1024px) {
       .container {
-        padding: 15px;
+        grid-template-columns: 1fr;
+        grid-template-rows: auto auto;
+      }
+
+      .upload-section {
+        border-right: none;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        padding: 40px 30px;
+      }
+
+      .preview-section {
+        border-right: none;
+        padding: 40px 30px;
+      }
+    }
+
+    @media (max-width: 640px) {
+      .upload-section {
+        padding: 30px 20px;
+      }
+
+      .preview-section {
+        padding: 30px 20px;
+      }
+
+      h1 {
+        font-size: 24px;
+      }
+
+      button {
+        padding: 12px;
+        font-size: 14px;
+      }
+
+      #preview {
+        max-width: 100%;
       }
     }
   </style>
@@ -78,70 +344,160 @@
 <body>
 
 <div class="container">
-  <h2>🧠 Trash Detection</h2>
+  <div class="upload-section">
+    <div class="header">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M12 2c5.523 0 10 4.477 10 10s-4.477 10-10 10S2 17.523 2 12 6.477 2 12 2z"></path>
+        <path d="M12 6v12M6 12h12" stroke="#4CAF50"></path>
+      </svg>
+      <h1>Trash Detection</h1>
+    </div>
 
-  <input type="file" id="fileInput" accept="image/*">
+    <div class="upload-area">
+      <div class="file-input-wrapper">
+        <input type="file" id="fileInput" accept="image/*">
+        <label for="fileInput" class="upload-label">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+            <polyline points="17 8 12 3 7 8"></polyline>
+            <line x1="12" y1="3" x2="12" y2="15"></line>
+          </svg>
+          <div class="upload-text">
+            Click to upload or drag
+            <span>Select an image</span>
+          </div>
+        </label>
+      </div>
+    </div>
 
-  <button onclick="upload()">Run Inference</button>
+    <button onclick="upload()" id="uploadBtn">
+      <svg style="display: inline; width: 18px; height: 18px; margin-right: 8px; vertical-align: middle;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <circle cx="12" cy="12" r="10"></circle>
+        <polyline points="12 6 12 12 16 14"></polyline>
+      </svg>
+      Run Inference
+    </button>
 
-  <p id="status" class="loading"></p>
-  <p id="result" class="result"></p>
+    <p id="status" class="status-text"></p>
+  </div>
 
-  <img id="preview"/>
+  <div class="preview-section">
+    <div class="preview-container">
+      <img id="preview"/>
+      <div id="result" class="result"></div>
+    </div>
+  </div>
 </div>
 
 <script>
 async function upload() {
     const fileInput = document.getElementById("fileInput");
     const file = fileInput.files[0];
+    const statusEl = document.getElementById("status");
+    const resultEl = document.getElementById("result");
+    const previewEl = document.getElementById("preview");
+    const uploadBtn = document.getElementById("uploadBtn");
 
     if (!file) {
-        alert("Please select an image");
+        resultEl.className = "result error show";
+        resultEl.innerHTML = `
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="10"></circle>
+            <line x1="12" y1="8" x2="12" y2="12"></line>
+            <line x1="12" y1="16" x2="12.01" y2="16"></line>
+          </svg>
+          Please select an image
+        `;
         return;
     }
 
     const formData = new FormData();
     formData.append("file", file);
 
-    // show preview instantly
-    document.getElementById("preview").src = URL.createObjectURL(file);
+    // Show preview instantly
+    previewEl.src = URL.createObjectURL(file);
+    previewEl.classList.add("show");
 
     // UI state
-    document.getElementById("status").innerText = "Processing...";
-    document.getElementById("result").innerText = "";
+    statusEl.innerHTML = '<span class="loading">⏳ Processing image...</span>';
+    resultEl.classList.remove("show");
+    uploadBtn.disabled = true;
 
     try {
-        const res = await fetch("https://corsage-drainable-trimmer.ngrok-free.dev/predict", {
+        const res = await fetch("https://something.trycloudflare.com/predict", {
             method: "POST",
             body: formData
         });
 
         const data = await res.json();
 
-        // remove loading
-        document.getElementById("status").innerText = "";
+        // Remove loading
+        statusEl.innerHTML = "";
 
-        // show annotated image (with boxes + mask)
-        document.getElementById("preview").src =
-            "data:image/jpeg;base64," + data.image;
+        // Show annotated image (with boxes + mask)
+        previewEl.src = "data:image/jpeg;base64," + data.image;
 
-        // result text
+        // Result text with icons
         if (data.prediction === 1.0) {
-            document.getElementById("result").innerText =
-                "🚨 Trash detected outside bin";
-            document.getElementById("result").style.color = "red";
+            resultEl.className = "result danger show";
+            resultEl.innerHTML = `
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon>
+              </svg>
+              <span>Trash detected outside bin</span>
+            `;
         } else {
-            document.getElementById("result").innerText =
-                "✅ No issue detected";
-            document.getElementById("result").style.color = "green";
+            resultEl.className = "result success show";
+            resultEl.innerHTML = `
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <polyline points="20 6 9 17 4 12"></polyline>
+              </svg>
+              <span>No issue detected</span>
+            `;
         }
 
     } catch (err) {
         console.error(err);
-        document.getElementById("status").innerText = "";
-        document.getElementById("result").innerText = "❌ Error occurred";
+        statusEl.innerHTML = "";
+        resultEl.className = "result error show";
+        resultEl.innerHTML = `
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="10"></circle>
+            <line x1="15" y1="9" x2="9" y2="15"></line>
+            <line x1="9" y1="9" x2="15" y2="15"></line>
+          </svg>
+          <span>Error occurred. Please try again.</span>
+        `;
+    } finally {
+        uploadBtn.disabled = false;
     }
 }
+
+// Drag and drop functionality
+const fileInput = document.getElementById("fileInput");
+const uploadLabel = document.querySelector(".upload-label");
+
+uploadLabel.addEventListener("dragover", (e) => {
+    e.preventDefault();
+    uploadLabel.style.borderColor = "rgba(76, 175, 80, 0.8)";
+    uploadLabel.style.background = "rgba(76, 175, 80, 0.15)";
+});
+
+uploadLabel.addEventListener("dragleave", () => {
+    uploadLabel.style.borderColor = "rgba(255, 255, 255, 0.3)";
+    uploadLabel.style.background = "rgba(76, 175, 80, 0.05)";
+});
+
+uploadLabel.addEventListener("drop", (e) => {
+    e.preventDefault();
+    uploadLabel.style.borderColor = "rgba(255, 255, 255, 0.3)";
+    uploadLabel.style.background = "rgba(76, 175, 80, 0.05)";
+    
+    const files = e.dataTransfer.files;
+    if (files.length > 0) {
+        fileInput.files = files;
+    }
+});
 </script>
 
 </body>
