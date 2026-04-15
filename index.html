@@ -345,6 +345,11 @@
       gap: 12px;
     }
 
+    .action-card.drag-over {
+      border-color: var(--accent);
+      background: rgba(255, 255, 255, 0.06);
+    }
+
     .action-top {
       display: flex;
       align-items: flex-start;
@@ -945,7 +950,7 @@
         <p class="eyebrow">Dustbin Management Committee, IIT Kanpur</p>
         <h1>Capture or upload an image for analysis.</h1>
         <p>
-          ANALOG MINDS by Farhan Haroon and Shambhavi Pandey (Perception and Intelligence Lab)
+          Perception and Intelligence Lab
         </p>
       </div>
     </header>
@@ -983,7 +988,7 @@
             </div>
           </label>
 
-          <label class="action-card">
+          <label class="action-card" id="uploadCard">
             <div class="action-top">
               <div class="icon-wrap" aria-hidden="true">
                 <svg viewBox="0 0 24 24" fill="none" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
@@ -994,7 +999,7 @@
               </div>
               <div class="action-copy">
                 <h3>Upload images</h3>
-                <p>Select one or more image files from the device.</p>
+                <p>Select one or more image files from the device, or drag and drop here.</p>
               </div>
             </div>
             <div class="file-control">
@@ -1469,6 +1474,22 @@
 
     cameraInput.addEventListener("change", () => updateSelectedText(cameraInput, cameraFileText, "No file selected."));
     filesInput.addEventListener("change", () => updateSelectedText(filesInput, filesFileText, "No files selected."));
+
+    const uploadCard = document.getElementById("uploadCard");
+    uploadCard.addEventListener("dragover", (event) => {
+      event.preventDefault();
+      uploadCard.classList.add("drag-over");
+    });
+    uploadCard.addEventListener("dragleave", (event) => {
+      if (!uploadCard.contains(event.relatedTarget)) {
+        uploadCard.classList.remove("drag-over");
+      }
+    });
+    uploadCard.addEventListener("drop", (event) => {
+      event.preventDefault();
+      uploadCard.classList.remove("drag-over");
+      addFiles(event.dataTransfer.files, "upload");
+    });
     imageModalClose.addEventListener("click", closeImageModal);
     imageModal.addEventListener("click", (event) => {
       if (event.target === imageModal) {
