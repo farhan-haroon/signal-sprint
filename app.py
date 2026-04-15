@@ -37,5 +37,5 @@ async def run_inference(file: UploadFile = File(...)):
     return {
         "prediction": float(result),
         "image": img_str,
-        "bin_detected": bool(bin_detected)
+        "bin_detected": bin_detected
     }
