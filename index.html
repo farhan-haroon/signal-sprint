@@ -477,18 +477,20 @@
     @media (max-width: 900px) { :root { --sidebar-w: 260px; } }
 
     @media (max-width: 640px) {
-      html, body { overflow:auto; height:auto; }
+      html, body { overflow: hidden; height: 100vh; }
 
-      .layout { flex-direction:column; overflow:visible; min-height:0; }
+      .layout { flex-direction:column; overflow:hidden; min-height:0; }
       .sidebar { display:none; }
 
       .main {
         width:100%;
-        min-height:calc(100dvh - var(--topbar-h));
-        overflow:visible;
+        min-height:0;
+        flex:1;
+        overflow:hidden;
       }
       .results-area {
-        overflow:visible;
+        overflow-y:auto;
+        overflow-x:hidden;
         flex:1;
         padding:14px 14px 100px;
       }
