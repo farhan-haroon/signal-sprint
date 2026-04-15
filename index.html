@@ -41,7 +41,7 @@
         radial-gradient(circle at top, rgba(255, 255, 255, 0.16), transparent 36%),
         url("diamond_jubilee.jpg") center center / cover no-repeat fixed;
       color: var(--text);
-      font-family: "Times New Roman", Georgia, serif;
+      font-family: "Palatino Linotype", "Book Antiqua", Georgia, serif;
     }
 
     body {
@@ -429,13 +429,17 @@
     }
 
     .results-meta {
-      display: grid;
+      display: flex;
+      align-items: stretch;
+      justify-content: flex-end;
       gap: 12px;
-      justify-items: end;
+      flex-wrap: wrap;
     }
 
     .results-meta .status-panel {
-      min-width: min(280px, 100%);
+      min-width: 260px;
+      padding: 10px 14px;
+      align-content: center;
     }
 
     .queue-chip {
@@ -598,7 +602,8 @@
       }
 
       .results-meta {
-        justify-items: stretch;
+        flex-direction: column;
+        align-items: stretch;
       }
 
       .gallery {
@@ -776,9 +781,7 @@
       }));
 
       queue = queue.concat(queuedItems);
-      renderQueuedItems(queuedItems);
       updateSummary();
-      toggleEmptyState();
       updateInputPreview(source, incoming);
 
       const sourceLabel = source === "camera" ? "camera" : "upload";
@@ -838,6 +841,8 @@
         return;
       }
 
+      gallery.innerHTML = "";
+      toggleEmptyState();
       setStatus("Running inference on " + queue.length + " file(s)...");
 
       const items = [...queue];
@@ -858,9 +863,9 @@
           }
 
           const data = await response.json();
-          updateResultCard(item, data.image, getLabel(data.bin_detected, data.prediction));
+          appendResultCard(item, data.image, getLabel(data.bin_detected, data.prediction));
         } catch (error) {
-          updateErrorCard(item);
+          appendErrorCard(item);
         }
       }
 
@@ -871,55 +876,35 @@
       setStatus("Inference complete.");
     }
 
-    function renderQueuedItems(items) {
-      for (const item of items) {
-        const card = document.createElement("article");
-        card.className = "card";
-        card.dataset.fileName = item.file.name;
-        card.innerHTML = `
-          <img src="${item.previewUrl}" alt="Preview for ${escapeHtml(item.file.name)}">
-          <div class="card-body">
-            <div class="file-name">${escapeHtml(item.file.name)}</div>
-            <div class="result-label">Preview ready. Run inference to analyze this image.</div>
-          </div>
-        `;
-        gallery.appendChild(card);
-        item.card = card;
-        const image = card.querySelector("img");
-        if (image) {
-          image.addEventListener("click", () => openImageModal(image.src, item.file.name));
-        }
-      }
-    }
-
-    function updateResultCard(item, imageBase64, label) {
-      if (!item.card) {
-        return;
-      }
-
-      const image = item.card.querySelector("img");
-      const resultLabel = item.card.querySelector(".result-label");
-
+    function appendResultCard(item, imageBase64, label) {
+      const card = document.createElement("article");
+      card.className = "card";
+      card.innerHTML = `
+        <img src="data:image/jpeg;base64,${imageBase64}" alt="Inference result for ${escapeHtml(item.file.name)}">
+        <div class="card-body">
+          <div class="file-name">${escapeHtml(item.file.name)}</div>
+          <div class="result-label">${escapeHtml(label)}</div>
+        </div>
+      `;
+      const image = card.querySelector("img");
       if (image) {
-        image.src = "data:image/jpeg;base64," + imageBase64;
-        image.alt = "Inference result for " + item.file.name;
+        image.addEventListener("click", () => openImageModal(image.src, item.file.name));
       }
-
-      if (resultLabel) {
-        resultLabel.textContent = label;
-      }
+      gallery.appendChild(card);
+      toggleEmptyState();
     }
 
-    function updateErrorCard(item) {
-      if (!item.card) {
-        return;
-      }
-
-      const resultLabel = item.card.querySelector(".result-label");
-
-      if (resultLabel) {
-        resultLabel.textContent = "Unable to process this image.";
-      }
+    function appendErrorCard(item) {
+      const card = document.createElement("article");
+      card.className = "card";
+      card.innerHTML = `
+        <div class="card-body">
+          <div class="file-name">${escapeHtml(item.file.name)}</div>
+          <div class="result-label">Unable to process this image.</div>
+        </div>
+      `;
+      gallery.appendChild(card);
+      toggleEmptyState();
     }
 
     function releasePreviewUrls() {
