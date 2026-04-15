@@ -44,6 +44,11 @@
       font-family: "Palatino Linotype", "Book Antiqua", Georgia, serif;
     }
 
+    html.solid-bg, body.solid-bg {
+      background:
+        linear-gradient(rgba(5, 7, 9, 0.95), rgba(5, 7, 9, 0.95));
+    }
+
     body {
       min-height: 100dvh;
     }
@@ -73,8 +78,30 @@
       gap: 16px;
       padding: 10px 14px;
       background: rgba(7, 9, 11, 0.72);
-      border-color: rgba(255, 255, 255, 0.2);
-      backdrop-filter: blur(14px);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-xl);
+      box-shadow: var(--shadow);
+      backdrop-filter: blur(10px);
+    }
+
+    .theme-toggle {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 36px;
+      height: 36px;
+      border: 1px solid var(--border-soft);
+      border-radius: 8px;
+      background: rgba(255, 255, 255, 0.08);
+      color: var(--text);
+      cursor: pointer;
+      font-size: 0.9rem;
+      transition: background 0.2s ease, border-color 0.2s ease;
+    }
+
+    .theme-toggle:hover {
+      background: rgba(255, 255, 255, 0.14);
+      border-color: var(--border);
     }
 
     .brand {
@@ -797,6 +824,7 @@
   <div class="page">
     <nav class="panel topbar">
       <a class="brand" href="index.html">Analog Minds</a>
+      <button class="theme-toggle" id="themeToggle" title="Toggle background mode">🎨</button>
       <details class="menu">
         <summary class="menu-toggle">Menu</summary>
         <div class="nav">
@@ -1327,6 +1355,36 @@
 
     updateSummary();
     toggleEmptyState();
+
+    // Theme toggle functionality
+    const themeToggle = document.getElementById("themeToggle");
+    themeToggle.addEventListener("click", () => {
+      const html = document.documentElement;
+      const body = document.body;
+      const isSolidBg = html.classList.contains("solid-bg");
+      
+      if (isSolidBg) {
+        html.classList.remove("solid-bg");
+        body.classList.remove("solid-bg");
+        themeToggle.textContent = "🎨";
+        localStorage.setItem("bgMode", "translucent");
+      } else {
+        html.classList.add("solid-bg");
+        body.classList.add("solid-bg");
+        themeToggle.textContent = "🌑";
+        localStorage.setItem("bgMode", "solid");
+      }
+    });
+
+    // Restore saved background mode on page load
+    const savedBgMode = localStorage.getItem("bgMode") || "translucent";
+    if (savedBgMode === "solid") {
+      document.documentElement.classList.add("solid-bg");
+      document.body.classList.add("solid-bg");
+      themeToggle.textContent = "🌑";
+    } else {
+      themeToggle.textContent = "🎨";
+    }
   </script>
 </body>
 </html>
