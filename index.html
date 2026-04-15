@@ -513,22 +513,52 @@
     @media (max-width: 380px) {
       .gallery { grid-template-columns:1fr 1fr; }
     }
-
-    .sidebar.hidden {
-      display: none;
+    
+    /* resizable sidebar */
+    .sidebar {
+      width: var(--sidebar-w);
+      resize: horizontal;
+      overflow: auto;
+      min-width: 180px;
+      max-width: 400px;
     }
-    .layout.full .main {
-      width: 100%;
+    /* full stretch */
+    .layout {
+    width: 100vw;
+    height: calc(100vh - var(--topbar-h));
     }
-    /* improve width usage */
+    /* better grid */
     .gallery {
-      grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
-      gap: 18px;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+    gap: 18px;
+    width: 100%;
     }
-    /* reduce padding (more usable space) */
-    .results-area {
-      padding: 16px 12px 32px;
+    /* modal */
+    .modal {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.9);
+    display: none;
+    align-items: center;
+    justify-content: center;
+    z-index: 999;
     }
+    .modal img {
+    max-width: 90%;
+    max-height: 90%;
+    border: 1px solid #333;
+    }
+    .modal.open {
+    display: flex;
+    animation: fadeIn 0.2s ease;
+    }
+    /* drag handle */
+    .resize-handle {
+    width: 4px;
+    cursor: ew-resize;
+    background: var(--border);
+  }
   </style>
 </head>
 <body>
