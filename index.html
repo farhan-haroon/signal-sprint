@@ -63,26 +63,10 @@
     }
 
     .hero {
-      position: relative;
       display: flex;
       align-items: center;
       justify-content: center;
       padding: 24px 26px;
-    }
-
-    .hero-logo {
-      position: absolute;
-      top: 20px;
-      left: 24px;
-      display: flex;
-      align-items: center;
-    }
-
-    .hero-logo img {
-      width: 72px;
-      height: auto;
-      display: block;
-      object-fit: contain;
     }
 
     .hero-copy {
@@ -412,24 +396,12 @@
       .gallery {
         grid-template-columns: 1fr;
       }
-
-      .hero-logo {
-        top: 16px;
-        left: 18px;
-      }
-
-      .hero-logo img {
-        width: 56px;
-      }
     }
   </style>
 </head>
 <body>
   <div class="page">
     <header class="panel hero">
-      <div class="hero-logo">
-        <img src="iitk.png" alt="IIT Kanpur logo">
-      </div>
       <div class="hero-copy">
         <p class="eyebrow">Trash Detection</p>
         <h1>Upload or capture an image for inference.</h1>
