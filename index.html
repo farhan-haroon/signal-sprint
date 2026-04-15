@@ -1128,7 +1128,7 @@
       if (image) {
         image.addEventListener("click", () => {
           const title = image.dataset.currentVariant === "analyzed" ? "Analyzed - " + item.file.name : "Original - " + item.file.name;
-          openImageModal(image.src, title);
+          openImageModal(image.src, title, image);
         });
       }
 
@@ -1308,6 +1308,7 @@
       imageModal.setAttribute("aria-hidden", "true");
       imageModalImage.removeAttribute("src");
       imageModalDownload.href = "#";
+      document.getElementById("imageModalVariants").style.display = "none";
     }
 
     cameraInput.addEventListener("change", () => updateSelectedText(cameraInput, cameraFileText, "No file selected."));
