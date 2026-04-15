@@ -330,6 +330,34 @@
       white-space: nowrap;
     }
 
+    .input-preview {
+      display: none;
+      gap: 10px;
+      padding: 10px;
+      border: 1px solid var(--border-soft);
+      background: rgba(255, 255, 255, 0.06);
+    }
+
+    .input-preview.is-visible {
+      display: grid;
+    }
+
+    .input-preview img {
+      display: block;
+      width: 100%;
+      max-height: 180px;
+      object-fit: cover;
+      border-radius: 8px;
+      background: rgba(0, 0, 0, 0.18);
+    }
+
+    .input-preview-text {
+      color: var(--muted);
+      font-size: 0.88rem;
+      line-height: 1.45;
+      word-break: break-word;
+    }
+
     .button-row {
       display: grid;
       grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -459,12 +487,67 @@
       aspect-ratio: 1 / 1;
       object-fit: cover;
       background: var(--bg-soft);
+      cursor: pointer;
     }
 
     .card-body {
       padding: 14px;
       display: grid;
       gap: 6px;
+    }
+
+    .image-modal {
+      position: fixed;
+      inset: 0;
+      z-index: 100;
+      display: none;
+      place-items: center;
+      padding: 24px;
+      background: rgba(0, 0, 0, 0.72);
+    }
+
+    .image-modal.is-open {
+      display: grid;
+    }
+
+    .image-modal-dialog {
+      width: min(760px, 100%);
+      max-height: 90vh;
+      padding: 14px;
+      border: 1px solid rgba(255, 255, 255, 0.16);
+      background: #0d0d0d;
+      box-shadow: 0 24px 60px rgba(0, 0, 0, 0.45);
+    }
+
+    .image-modal-top {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      margin-bottom: 12px;
+    }
+
+    .image-modal-title {
+      color: var(--text);
+      font-size: 1rem;
+      line-height: 1.4;
+      word-break: break-word;
+    }
+
+    .image-modal-close {
+      min-height: auto;
+      padding: 8px 12px;
+      border-radius: 8px;
+      background: rgba(255, 255, 255, 0.08);
+      color: var(--text);
+    }
+
+    .image-modal img {
+      display: block;
+      width: 100%;
+      max-height: calc(90vh - 90px);
+      object-fit: contain;
+      background: #050505;
     }
 
     .file-name {
@@ -570,10 +653,14 @@
                 <p>Opens the camera on supported mobile browsers.</p>
               </div>
             </div>
-            <div class="file-control">
+          <div class="file-control">
               <span class="file-button">Capture</span>
               <span class="file-name-text" id="cameraFileText">No file selected.</span>
               <input type="file" id="cameraInput" accept="image/*" capture="environment">
+            </div>
+            <div class="input-preview" id="cameraPreview">
+              <img id="cameraPreviewImage" alt="Camera preview">
+              <div class="input-preview-text" id="cameraPreviewText"></div>
             </div>
           </label>
 
@@ -595,6 +682,10 @@
               <span class="file-button">Browse</span>
               <span class="file-name-text" id="filesFileText">No files selected.</span>
               <input type="file" id="filesInput" multiple accept="image/*">
+            </div>
+            <div class="input-preview" id="filesPreview">
+              <img id="filesPreviewImage" alt="Upload preview">
+              <div class="input-preview-text" id="filesPreviewText"></div>
             </div>
           </label>
 
@@ -632,6 +723,16 @@
     </section>
   </div>
 
+  <div class="image-modal" id="imageModal" aria-hidden="true">
+    <div class="image-modal-dialog">
+      <div class="image-modal-top">
+        <div class="image-modal-title" id="imageModalTitle">Image preview</div>
+        <button class="image-modal-close" type="button" id="imageModalClose">Close</button>
+      </div>
+      <img id="imageModalImage" alt="Expanded result preview">
+    </div>
+  </div>
+
   <script>
     const API = "https://corsage-drainable-trimmer.ngrok-free.dev/predict";
 
@@ -639,12 +740,24 @@
     const filesInput = document.getElementById("filesInput");
     const cameraFileText = document.getElementById("cameraFileText");
     const filesFileText = document.getElementById("filesFileText");
+    const cameraPreview = document.getElementById("cameraPreview");
+    const cameraPreviewImage = document.getElementById("cameraPreviewImage");
+    const cameraPreviewText = document.getElementById("cameraPreviewText");
+    const filesPreview = document.getElementById("filesPreview");
+    const filesPreviewImage = document.getElementById("filesPreviewImage");
+    const filesPreviewText = document.getElementById("filesPreviewText");
     const statusText = document.getElementById("status");
     const summary = document.getElementById("summary");
     const gallery = document.getElementById("gallery");
     const emptyState = document.getElementById("emptyState");
+    const imageModal = document.getElementById("imageModal");
+    const imageModalImage = document.getElementById("imageModalImage");
+    const imageModalTitle = document.getElementById("imageModalTitle");
+    const imageModalClose = document.getElementById("imageModalClose");
 
     let queue = [];
+    let cameraPreviewUrl = "";
+    let filesPreviewUrl = "";
 
     cameraInput.addEventListener("change", (event) => addFiles(event.target.files, "camera"));
     filesInput.addEventListener("change", (event) => addFiles(event.target.files, "upload"));
@@ -666,6 +779,7 @@
       renderQueuedItems(queuedItems);
       updateSummary();
       toggleEmptyState();
+      updateInputPreview(source, incoming);
 
       const sourceLabel = source === "camera" ? "camera" : "upload";
       setStatus(incoming.length + " image(s) added from " + sourceLabel + ". " + queue.length + " queued.");
@@ -704,6 +818,8 @@
       filesInput.value = "";
       cameraFileText.textContent = "No file selected.";
       filesFileText.textContent = "No files selected.";
+      clearInputPreview("camera");
+      clearInputPreview("upload");
     }
 
     function clearAll() {
@@ -769,6 +885,10 @@
         `;
         gallery.appendChild(card);
         item.card = card;
+        const image = card.querySelector("img");
+        if (image) {
+          image.addEventListener("click", () => openImageModal(image.src, item.file.name));
+        }
       }
     }
 
@@ -831,8 +951,79 @@
         .replaceAll("'", "&#39;");
     }
 
+    function updateInputPreview(source, files) {
+      const firstFile = files[0];
+      if (!firstFile) {
+        return;
+      }
+
+      if (source === "camera") {
+        if (cameraPreviewUrl) {
+          URL.revokeObjectURL(cameraPreviewUrl);
+        }
+        cameraPreviewUrl = URL.createObjectURL(firstFile);
+        cameraPreviewImage.src = cameraPreviewUrl;
+        cameraPreviewText.textContent = firstFile.name;
+        cameraPreview.classList.add("is-visible");
+        return;
+      }
+
+      if (filesPreviewUrl) {
+        URL.revokeObjectURL(filesPreviewUrl);
+      }
+      filesPreviewUrl = URL.createObjectURL(firstFile);
+      filesPreviewImage.src = filesPreviewUrl;
+      filesPreviewText.textContent = files.length === 1 ? firstFile.name : firstFile.name + " and " + (files.length - 1) + " more image(s).";
+      filesPreview.classList.add("is-visible");
+    }
+
+    function clearInputPreview(source) {
+      if (source === "camera") {
+        if (cameraPreviewUrl) {
+          URL.revokeObjectURL(cameraPreviewUrl);
+          cameraPreviewUrl = "";
+        }
+        cameraPreviewImage.removeAttribute("src");
+        cameraPreviewText.textContent = "";
+        cameraPreview.classList.remove("is-visible");
+        return;
+      }
+
+      if (filesPreviewUrl) {
+        URL.revokeObjectURL(filesPreviewUrl);
+        filesPreviewUrl = "";
+      }
+      filesPreviewImage.removeAttribute("src");
+      filesPreviewText.textContent = "";
+      filesPreview.classList.remove("is-visible");
+    }
+
+    function openImageModal(src, title) {
+      imageModalImage.src = src;
+      imageModalTitle.textContent = title;
+      imageModal.classList.add("is-open");
+      imageModal.setAttribute("aria-hidden", "false");
+    }
+
+    function closeImageModal() {
+      imageModal.classList.remove("is-open");
+      imageModal.setAttribute("aria-hidden", "true");
+      imageModalImage.removeAttribute("src");
+    }
+
     cameraInput.addEventListener("change", () => updateSelectedText(cameraInput, cameraFileText, "No file selected."));
     filesInput.addEventListener("change", () => updateSelectedText(filesInput, filesFileText, "No files selected."));
+    imageModalClose.addEventListener("click", closeImageModal);
+    imageModal.addEventListener("click", (event) => {
+      if (event.target === imageModal) {
+        closeImageModal();
+      }
+    });
+    document.addEventListener("keydown", (event) => {
+      if (event.key === "Escape" && imageModal.classList.contains("is-open")) {
+        closeImageModal();
+      }
+    });
 
     updateSummary();
     toggleEmptyState();
