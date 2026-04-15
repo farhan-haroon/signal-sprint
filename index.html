@@ -84,6 +84,12 @@
       backdrop-filter: blur(10px);
     }
 
+    .topbar-actions {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
     .theme-toggle {
       display: inline-flex;
       align-items: center;
@@ -95,13 +101,21 @@
       background: rgba(255, 255, 255, 0.08);
       color: var(--text);
       cursor: pointer;
-      font-size: 0.9rem;
+      padding: 0;
       transition: background 0.2s ease, border-color 0.2s ease;
     }
 
     .theme-toggle:hover {
       background: rgba(255, 255, 255, 0.14);
       border-color: var(--border);
+    }
+
+    .theme-toggle svg {
+      width: 18px;
+      height: 18px;
+      stroke: currentColor;
+      stroke-width: 1.8;
+      fill: none;
     }
 
     .brand {
@@ -824,15 +838,32 @@
   <div class="page">
     <nav class="panel topbar">
       <a class="brand" href="index.html">Analog Minds</a>
-      <button class="theme-toggle" id="themeToggle" title="Toggle background mode">🎨</button>
-      <details class="menu">
-        <summary class="menu-toggle">Menu</summary>
-        <div class="nav">
-          <a class="active" href="index.html">Home</a>
-          <a href="about.html">About</a>
-          <a href="help.html">Help</a>
-        </div>
-      </details>
+      <div class="topbar-actions">
+        <button class="theme-toggle" id="themeToggle" title="Toggle background mode">
+          <svg viewBox="0 0 24 24" class="theme-icon-light">
+            <circle cx="12" cy="12" r="5"></circle>
+            <line x1="12" y1="1" x2="12" y2="3"></line>
+            <line x1="12" y1="21" x2="12" y2="23"></line>
+            <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+            <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+            <line x1="1" y1="12" x2="3" y2="12"></line>
+            <line x1="21" y1="12" x2="23" y2="12"></line>
+            <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+            <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+          </svg>
+          <svg viewBox="0 0 24 24" class="theme-icon-dark" style="display: none;">
+            <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+          </svg>
+        </button>
+        <details class="menu">
+          <summary class="menu-toggle">Menu</summary>
+          <div class="nav">
+            <a class="active" href="index.html">Home</a>
+            <a href="about.html">About</a>
+            <a href="help.html">Help</a>
+          </div>
+        </details>
+      </div>
     </nav>
 
     <header class="panel hero">
@@ -1358,6 +1389,21 @@
 
     // Theme toggle functionality
     const themeToggle = document.getElementById("themeToggle");
+    const themeIconLight = themeToggle.querySelector(".theme-icon-light");
+    const themeIconDark = themeToggle.querySelector(".theme-icon-dark");
+    
+    function updateThemeIcons() {
+      const html = document.documentElement;
+      const isSolidBg = html.classList.contains("solid-bg");
+      if (isSolidBg) {
+        themeIconLight.style.display = "none";
+        themeIconDark.style.display = "block";
+      } else {
+        themeIconLight.style.display = "block";
+        themeIconDark.style.display = "none";
+      }
+    }
+    
     themeToggle.addEventListener("click", () => {
       const html = document.documentElement;
       const body = document.body;
@@ -1366,14 +1412,13 @@
       if (isSolidBg) {
         html.classList.remove("solid-bg");
         body.classList.remove("solid-bg");
-        themeToggle.textContent = "🎨";
         localStorage.setItem("bgMode", "translucent");
       } else {
         html.classList.add("solid-bg");
         body.classList.add("solid-bg");
-        themeToggle.textContent = "🌑";
         localStorage.setItem("bgMode", "solid");
       }
+      updateThemeIcons();
     });
 
     // Restore saved background mode on page load
@@ -1381,10 +1426,8 @@
     if (savedBgMode === "solid") {
       document.documentElement.classList.add("solid-bg");
       document.body.classList.add("solid-bg");
-      themeToggle.textContent = "🌑";
-    } else {
-      themeToggle.textContent = "🎨";
     }
+    updateThemeIcons();
   </script>
 </body>
 </html>
