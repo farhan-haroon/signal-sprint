@@ -39,7 +39,7 @@
         radial-gradient(circle at top, rgba(255, 255, 255, 0.04), transparent 28%),
         linear-gradient(180deg, #07090c 0%, #040506 100%);
       color: var(--text);
-      font-family: "Segoe UI", "Helvetica Neue", Arial, sans-serif;
+      font-family: "Times New Roman", Georgia, serif;
     }
 
     body {
@@ -201,20 +201,42 @@
       line-height: 1.5;
     }
 
-    input[type="file"] {
-      width: 100%;
+    .file-control {
+      position: relative;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      min-height: 42px;
+      overflow: hidden;
       color: var(--muted);
       font-size: 0.9rem;
     }
 
-    input[type="file"]::file-selector-button {
-      margin-right: 12px;
+    .file-control input[type="file"] {
+      position: absolute;
+      inset: 0;
+      opacity: 0;
+      cursor: pointer;
+    }
+
+    .file-button {
       border: 1px solid var(--border);
       border-radius: 999px;
       padding: 10px 14px;
       background: rgba(255, 255, 255, 0.04);
       color: var(--text);
-      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      white-space: nowrap;
+      font-family: inherit;
+    }
+
+    .file-name-text {
+      min-width: 0;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
     }
 
     .button-row {
@@ -435,7 +457,11 @@
               <p>Opens the camera on supported mobile browsers.</p>
             </div>
           </div>
-          <input type="file" id="cameraInput" accept="image/*" capture="environment">
+          <div class="file-control">
+            <span class="file-button">Capture</span>
+            <span class="file-name-text" id="cameraFileText">No file selected.</span>
+            <input type="file" id="cameraInput" accept="image/*" capture="environment">
+          </div>
         </label>
 
         <label class="action-card">
@@ -452,7 +478,11 @@
               <p>Select one or more image files from the device.</p>
             </div>
           </div>
-          <input type="file" id="filesInput" multiple accept="image/*">
+          <div class="file-control">
+            <span class="file-button">Browse</span>
+            <span class="file-name-text" id="filesFileText">No files selected.</span>
+            <input type="file" id="filesInput" multiple accept="image/*">
+          </div>
         </label>
 
         <label class="action-card">
@@ -467,7 +497,11 @@
               <p>Queue a larger batch of images in one go.</p>
             </div>
           </div>
-          <input type="file" id="folderInput" webkitdirectory multiple accept="image/*">
+          <div class="file-control">
+            <span class="file-button">Browse</span>
+            <span class="file-name-text" id="folderFileText">No directory selected.</span>
+            <input type="file" id="folderInput" webkitdirectory multiple accept="image/*">
+          </div>
         </label>
 
         <div class="button-row">
@@ -506,6 +540,9 @@
     const cameraInput = document.getElementById("cameraInput");
     const filesInput = document.getElementById("filesInput");
     const folderInput = document.getElementById("folderInput");
+    const cameraFileText = document.getElementById("cameraFileText");
+    const filesFileText = document.getElementById("filesFileText");
+    const folderFileText = document.getElementById("folderFileText");
     const statusText = document.getElementById("status");
     const summary = document.getElementById("summary");
     const gallery = document.getElementById("gallery");
@@ -532,6 +569,22 @@
       setStatus(incoming.length + " image(s) added from " + sourceLabel + ". " + queue.length + " queued.");
     }
 
+    function updateSelectedText(input, target, emptyLabel) {
+      const count = input.files ? input.files.length : 0;
+
+      if (!count) {
+        target.textContent = emptyLabel;
+        return;
+      }
+
+      if (count === 1) {
+        target.textContent = input.files[0].name;
+        return;
+      }
+
+      target.textContent = count + " files selected.";
+    }
+
     function updateSummary() {
       summary.textContent = queue.length === 1 ? "1 file queued" : queue.length + " files queued";
     }
@@ -548,6 +601,9 @@
       cameraInput.value = "";
       filesInput.value = "";
       folderInput.value = "";
+      cameraFileText.textContent = "No file selected.";
+      filesFileText.textContent = "No files selected.";
+      folderFileText.textContent = "No directory selected.";
     }
 
     function clearAll() {
@@ -645,6 +701,10 @@
         .replaceAll('"', "&quot;")
         .replaceAll("'", "&#39;");
     }
+
+    cameraInput.addEventListener("change", () => updateSelectedText(cameraInput, cameraFileText, "No file selected."));
+    filesInput.addEventListener("change", () => updateSelectedText(filesInput, filesFileText, "No files selected."));
+    folderInput.addEventListener("change", () => updateSelectedText(folderInput, folderFileText, "No directory selected."));
 
     updateSummary();
     toggleEmptyState();
