@@ -9,18 +9,18 @@
       color-scheme: dark;
       --bg: #050709;
       --bg-soft: #0a0e12;
-      --surface: rgba(11, 15, 19, 0.92);
-      --surface-strong: rgba(15, 20, 25, 0.98);
-      --surface-faint: rgba(255, 255, 255, 0.025);
-      --border: rgba(255, 255, 255, 0.08);
-      --border-soft: rgba(255, 255, 255, 0.05);
+      --surface: rgba(7, 11, 15, 0.54);
+      --surface-strong: rgba(8, 12, 16, 0.68);
+      --surface-faint: rgba(255, 255, 255, 0.04);
+      --border: rgba(255, 255, 255, 0.12);
+      --border-soft: rgba(255, 255, 255, 0.08);
       --text: #f3f5f7;
       --muted: #97a0ab;
       --accent: #d7dde5;
       --accent-strong: #ffffff;
       --success: #c9ff5a;
       --danger: #ff8a7a;
-      --shadow: 0 28px 80px rgba(0, 0, 0, 0.45);
+      --shadow: 0 28px 80px rgba(0, 0, 0, 0.28);
       --radius-xl: 28px;
       --radius-lg: 22px;
       --radius-md: 16px;
@@ -36,8 +36,9 @@
       margin: 0;
       min-height: 100%;
       background:
-        linear-gradient(rgba(5, 7, 9, 0.82), rgba(5, 7, 9, 0.9)),
-        radial-gradient(circle at top, rgba(255, 255, 255, 0.05), transparent 28%),
+        radial-gradient(circle at center, rgba(5, 7, 9, 0.22), rgba(5, 7, 9, 0.66) 70%),
+        linear-gradient(rgba(5, 7, 9, 0.38), rgba(5, 7, 9, 0.58)),
+        radial-gradient(circle at top, rgba(255, 255, 255, 0.08), transparent 32%),
         url("diamond_jubilee.jpg") center center / cover no-repeat fixed;
       color: var(--text);
       font-family: "Times New Roman", Georgia, serif;
@@ -60,7 +61,7 @@
       border: 1px solid var(--border);
       border-radius: var(--radius-xl);
       box-shadow: var(--shadow);
-      backdrop-filter: blur(10px);
+      backdrop-filter: blur(14px);
     }
 
     .hero {
@@ -158,7 +159,7 @@
       padding: 16px;
       border-radius: var(--radius-lg);
       border: 1px solid var(--border-soft);
-      background: var(--surface-faint);
+      background: rgba(8, 12, 16, 0.32);
       display: grid;
       gap: 12px;
     }
@@ -175,7 +176,7 @@
       border-radius: 14px;
       display: grid;
       place-items: center;
-      background: rgba(255, 255, 255, 0.04);
+      background: rgba(255, 255, 255, 0.06);
       border: 1px solid var(--border-soft);
       color: var(--accent);
       flex: 0 0 auto;
@@ -221,7 +222,7 @@
       border: 1px solid var(--border);
       border-radius: 999px;
       padding: 10px 14px;
-      background: rgba(255, 255, 255, 0.04);
+      background: rgba(255, 255, 255, 0.08);
       color: var(--text);
       display: inline-flex;
       align-items: center;
@@ -266,7 +267,7 @@
     }
 
     .ghost {
-      background: rgba(255, 255, 255, 0.03);
+      background: rgba(255, 255, 255, 0.07);
       color: var(--text);
     }
 
@@ -321,7 +322,7 @@
       padding: 10px 14px;
       border-radius: 999px;
       border: 1px solid var(--border-soft);
-      background: rgba(255, 255, 255, 0.03);
+      background: rgba(255, 255, 255, 0.07);
       color: var(--muted);
       font-size: 0.9rem;
       white-space: nowrap;
@@ -338,7 +339,7 @@
       height: 100%;
       border-radius: var(--radius-lg);
       border: 1px dashed var(--border-soft);
-      background: rgba(255, 255, 255, 0.015);
+      background: rgba(8, 12, 16, 0.24);
       display: grid;
       place-items: center;
       padding: 28px;
@@ -357,7 +358,7 @@
       overflow: hidden;
       border-radius: var(--radius-lg);
       border: 1px solid var(--border-soft);
-      background: rgba(255, 255, 255, 0.025);
+      background: rgba(8, 12, 16, 0.34);
     }
 
     .card img {
