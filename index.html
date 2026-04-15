@@ -557,6 +557,7 @@
     }
 
     .result-shell {
+      position: relative;
       display: grid;
       grid-template-columns: minmax(0, 1fr) auto;
       align-items: stretch;
@@ -1027,7 +1028,6 @@
         return;
       }
 
-      gallery.innerHTML = "";
       toggleEmptyState();
       setStatus("Running inference on " + queue.length + " file(s)...");
 
@@ -1078,7 +1078,6 @@
                 <button class="variant-button" type="button" data-variant="analyzed">Analyzed</button>
               </div>
             </div>
-            <a class="download-link result-download-link" href="${originalSrc}" download="original-${escapeHtml(item.file.name)}" title="Download"><svg viewBox="0 0 24 24" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg></a>
           </div>
           <section class="result-stage">
             <div class="result-shell">
@@ -1094,6 +1093,7 @@
                 data-original-download="original-${escapeHtml(item.file.name)}"
                 data-analyzed-download="analyzed-${escapeHtml(item.file.name)}"
               >
+              <a class="download-link result-download-link" href="${originalSrc}" download="original-${escapeHtml(item.file.name)}" title="Download"><svg viewBox="0 0 24 24" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg></a>
               <details class="remark-drawer">
                 <summary class="remark-tab">Remark</summary>
                 <div class="remark-panel">
