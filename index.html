@@ -531,7 +531,7 @@
       display: inline-flex;
       align-items: center;
       gap: 8px;
-      flex-wrap: wrap;
+      flex-wrap: nowrap;
     }
 
     .variant-button {
@@ -551,6 +551,7 @@
     }
 
     .result-stage {
+      position: relative;
       border: 1px solid var(--border-soft);
       background: rgba(255, 255, 255, 0.04);
     }
@@ -631,16 +632,27 @@
     }
 
     .download-link {
+      position: absolute;
+      bottom: 10px;
+      left: 10px;
       display: inline-flex;
       align-items: center;
       justify-content: center;
-      padding: 8px 10px;
-      border: 1px solid rgba(255, 255, 255, 0.14);
-      border-radius: 8px;
-      background: rgba(255, 255, 255, 0.08);
+      width: 32px;
+      height: 32px;
+      border: none;
+      border-radius: 6px;
+      background: rgba(255, 255, 255, 0.12);
       color: var(--text);
       text-decoration: none;
       font-size: 0.84rem;
+      padding: 0;
+    }
+    .download-link svg {
+      width: 16px;
+      height: 16px;
+      stroke: currentColor;
+      stroke-width: 2;
     }
 
     .image-modal {
@@ -901,7 +913,7 @@
       <div class="image-modal-top">
         <div class="image-modal-title" id="imageModalTitle">Image preview</div>
         <div class="image-modal-actions">
-          <a class="download-link" id="imageModalDownload" href="#" download="result.jpg">Download</a>
+          <a class="download-link" id="imageModalDownload" href="#" download="result.jpg" title="Download"><svg viewBox="0 0 24 24" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg></a>
           <button class="image-modal-close" type="button" id="imageModalClose">Close</button>
         </div>
       </div>
@@ -1066,7 +1078,7 @@
                 <button class="variant-button" type="button" data-variant="analyzed">Analyzed</button>
               </div>
             </div>
-            <a class="download-link result-download-link" href="${originalSrc}" download="original-${escapeHtml(item.file.name)}">Download</a>
+            <a class="download-link result-download-link" href="${originalSrc}" download="original-${escapeHtml(item.file.name)}" title="Download"><svg viewBox="0 0 24 24" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg></a>
           </div>
           <section class="result-stage">
             <div class="result-shell">
@@ -1085,8 +1097,8 @@
               <details class="remark-drawer">
                 <summary class="remark-tab">Remark</summary>
                 <div class="remark-panel">
-                  <div class="remark-title result-remark-title">Original Image</div>
-                  <div class="remark-text result-remark-text">This is the uploaded image before inference.</div>
+                  <div class="remark-title result-remark-title">Analysis</div>
+                  <div class="remark-text result-remark-text">${label}</div>
                 </div>
               </details>
             </div>
@@ -1124,8 +1136,6 @@
             image.dataset.currentVariant = "analyzed";
             downloadLink.href = image.dataset.analyzedSrc;
             downloadLink.download = image.dataset.analyzedDownload;
-            remarkTitle.textContent = "Inference";
-            remarkText.textContent = label;
             return;
           }
 
@@ -1134,8 +1144,6 @@
           image.dataset.currentVariant = "original";
           downloadLink.href = image.dataset.originalSrc;
           downloadLink.download = image.dataset.originalDownload;
-          remarkTitle.textContent = "Original Image";
-          remarkText.textContent = "This is the uploaded image before inference.";
         });
       });
 
