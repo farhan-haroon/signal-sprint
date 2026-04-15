@@ -3,24 +3,24 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Trash Detection</title>
+  <title>Trash Detection Web Interface</title>
   <style>
     :root {
       color-scheme: dark;
-      --bg: #07131a;
-      --bg-accent: #0d232c;
-      --panel: rgba(9, 26, 33, 0.9);
-      --panel-strong: rgba(13, 36, 45, 0.96);
-      --border: rgba(168, 234, 214, 0.18);
-      --text: #effaf7;
-      --muted: #9ec5bb;
-      --primary: #b9ff4f;
-      --primary-strong: #d6ff7f;
-      --danger: #ff6b57;
-      --shadow: 0 24px 60px rgba(0, 0, 0, 0.32);
-      --radius-lg: 28px;
-      --radius-md: 18px;
-      --radius-sm: 12px;
+      --bg: #051017;
+      --bg-soft: #0a1c26;
+      --panel: rgba(7, 24, 31, 0.88);
+      --panel-strong: rgba(10, 29, 37, 0.95);
+      --border: rgba(181, 240, 220, 0.14);
+      --text: #f4fcf9;
+      --muted: #9abcb2;
+      --accent: #c0ff52;
+      --accent-strong: #e1ff9b;
+      --danger: #ff7a66;
+      --shadow: 0 28px 60px rgba(0, 0, 0, 0.3);
+      --radius-xl: 30px;
+      --radius-lg: 22px;
+      --radius-md: 16px;
     }
 
     * {
@@ -33,9 +33,9 @@
       min-height: 100%;
       font-family: "Segoe UI", "Helvetica Neue", sans-serif;
       background:
-        radial-gradient(circle at top left, rgba(185, 255, 79, 0.2), transparent 24%),
-        radial-gradient(circle at top right, rgba(67, 189, 255, 0.16), transparent 28%),
-        linear-gradient(160deg, var(--bg) 0%, #061018 42%, #03070b 100%);
+        radial-gradient(circle at top left, rgba(192, 255, 82, 0.16), transparent 22%),
+        radial-gradient(circle at bottom right, rgba(76, 182, 255, 0.14), transparent 28%),
+        linear-gradient(180deg, #07131a 0%, #03090d 100%);
       color: var(--text);
     }
 
@@ -43,73 +43,177 @@
       min-height: 100dvh;
     }
 
-    .app-shell {
+    .page {
       min-height: 100dvh;
-      display: grid;
-      grid-template-columns: minmax(280px, 340px) minmax(0, 1fr);
-      gap: 20px;
+      display: flex;
+      flex-direction: column;
       padding: 20px;
+      gap: 20px;
     }
 
     .panel {
-      backdrop-filter: blur(16px);
-      background: var(--panel);
       border: 1px solid var(--border);
-      border-radius: var(--radius-lg);
+      border-radius: var(--radius-xl);
+      background: var(--panel);
+      backdrop-filter: blur(14px);
       box-shadow: var(--shadow);
     }
 
-    .sidebar {
-      display: flex;
-      flex-direction: column;
+    .hero {
+      display: grid;
+      grid-template-columns: minmax(0, 1.3fr) minmax(280px, 0.9fr);
+      gap: 20px;
       padding: 24px;
-      min-height: 0;
     }
 
-    .eyebrow {
-      margin: 0 0 10px;
-      color: var(--primary);
-      font-size: 0.82rem;
-      letter-spacing: 0.16em;
+    .hero-copy {
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      gap: 18px;
+    }
+
+    .kicker {
+      margin: 0;
+      color: var(--accent);
       text-transform: uppercase;
+      letter-spacing: 0.16em;
+      font-size: 0.82rem;
       font-weight: 700;
     }
 
     h1 {
       margin: 0;
-      font-size: clamp(2rem, 4vw, 3.5rem);
-      line-height: 0.96;
+      font-size: clamp(2.2rem, 5vw, 4.8rem);
+      line-height: 0.94;
+      max-width: 10ch;
     }
 
-    .intro {
-      margin: 14px 0 0;
+    .lede {
+      margin: 0;
+      max-width: 58ch;
+      line-height: 1.7;
       color: var(--muted);
-      line-height: 1.6;
-      max-width: 28ch;
+      font-size: 1.02rem;
     }
 
-    .control-group {
+    .hero-points {
       display: grid;
-      gap: 14px;
-      margin-top: 28px;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 12px;
     }
 
-    .upload-card {
-      display: grid;
-      gap: 8px;
-      padding: 16px;
+    .point {
+      padding: 14px;
       border-radius: var(--radius-md);
       background: rgba(255, 255, 255, 0.03);
-      border: 1px solid rgba(255, 255, 255, 0.08);
+      border: 1px solid rgba(255, 255, 255, 0.07);
     }
 
-    .upload-card span {
-      font-weight: 600;
+    .point strong {
+      display: block;
+      margin-bottom: 6px;
+      font-size: 0.98rem;
     }
 
-    .upload-card small {
+    .point span {
       color: var(--muted);
+      font-size: 0.92rem;
       line-height: 1.4;
+    }
+
+    .hero-card {
+      padding: 20px;
+      border-radius: var(--radius-lg);
+      background:
+        linear-gradient(180deg, rgba(192, 255, 82, 0.12), transparent 55%),
+        var(--panel-strong);
+      border: 1px solid rgba(192, 255, 82, 0.16);
+      display: grid;
+      gap: 16px;
+      align-content: start;
+    }
+
+    .hero-card h2,
+    .workspace-head h2 {
+      margin: 0;
+      font-size: 1.35rem;
+    }
+
+    .hero-card p,
+    .workspace-head p {
+      margin: 0;
+      color: var(--muted);
+      line-height: 1.6;
+    }
+
+    .metrics {
+      display: grid;
+      gap: 12px;
+    }
+
+    .metric {
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      align-items: baseline;
+      padding: 12px 14px;
+      border-radius: var(--radius-md);
+      background: rgba(255, 255, 255, 0.04);
+    }
+
+    .metric span {
+      color: var(--muted);
+    }
+
+    .metric strong {
+      font-size: 1.05rem;
+    }
+
+    .workspace {
+      flex: 1;
+      min-height: 0;
+      display: grid;
+      grid-template-columns: minmax(320px, 360px) minmax(0, 1fr);
+      gap: 20px;
+    }
+
+    .controls,
+    .results {
+      min-height: 0;
+      padding: 22px;
+    }
+
+    .controls {
+      display: flex;
+      flex-direction: column;
+      gap: 18px;
+    }
+
+    .workspace-head {
+      display: grid;
+      gap: 8px;
+    }
+
+    .action-card {
+      padding: 18px;
+      border-radius: var(--radius-lg);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      background: rgba(255, 255, 255, 0.03);
+      display: grid;
+      gap: 12px;
+    }
+
+    .action-card h3 {
+      margin: 0;
+      font-size: 1.02rem;
+    }
+
+    .action-card p {
+      margin: 0;
+      color: var(--muted);
+      line-height: 1.5;
+      font-size: 0.94rem;
     }
 
     input[type="file"] {
@@ -127,11 +231,10 @@
       cursor: pointer;
     }
 
-    .actions {
+    .button-row {
       display: grid;
       grid-template-columns: repeat(2, minmax(0, 1fr));
       gap: 12px;
-      margin-top: 18px;
     }
 
     button {
@@ -141,7 +244,7 @@
       font-size: 1rem;
       font-weight: 700;
       cursor: pointer;
-      transition: transform 0.18s ease, filter 0.18s ease, opacity 0.18s ease;
+      transition: transform 0.18s ease, filter 0.18s ease;
     }
 
     button:hover {
@@ -149,318 +252,347 @@
       filter: brightness(1.05);
     }
 
-    button:active {
-      transform: translateY(0);
+    .primary {
+      background: linear-gradient(135deg, var(--accent), var(--accent-strong));
+      color: #122100;
     }
 
-    .run {
-      background: linear-gradient(135deg, var(--primary) 0%, var(--primary-strong) 100%);
-      color: #102100;
+    .secondary {
+      background: rgba(255, 255, 255, 0.06);
+      color: var(--text);
+      border: 1px solid rgba(255, 255, 255, 0.08);
     }
 
-    .clear {
-      background: rgba(255, 107, 87, 0.15);
-      color: #ffd4ce;
-      border: 1px solid rgba(255, 107, 87, 0.3);
+    .danger {
+      background: rgba(255, 122, 102, 0.16);
+      color: #ffd7d1;
+      border: 1px solid rgba(255, 122, 102, 0.28);
     }
 
     .status-panel {
       margin-top: auto;
       padding: 16px;
-      border-radius: var(--radius-md);
+      border-radius: var(--radius-lg);
       background: var(--panel-strong);
-      border: 1px solid rgba(255, 255, 255, 0.07);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      display: grid;
+      gap: 8px;
     }
 
     .status-label {
-      display: block;
-      color: var(--muted);
-      font-size: 0.82rem;
-      letter-spacing: 0.08em;
+      margin: 0;
       text-transform: uppercase;
-      margin-bottom: 8px;
+      font-size: 0.78rem;
+      letter-spacing: 0.12em;
+      color: var(--muted);
+      font-weight: 700;
     }
 
-    .status {
-      min-height: 1.4em;
-      font-size: 0.98rem;
+    .status-text {
+      margin: 0;
       line-height: 1.5;
     }
 
-    .main {
+    .results {
       display: flex;
       flex-direction: column;
-      min-height: 0;
-      padding: 24px;
       overflow: hidden;
     }
 
-    .main-header {
+    .results-top {
       display: flex;
-      align-items: end;
       justify-content: space-between;
       gap: 16px;
+      align-items: end;
       margin-bottom: 18px;
     }
 
-    .main-header h2 {
-      margin: 0;
-      font-size: clamp(1.35rem, 2vw, 1.9rem);
-    }
-
-    .main-header p {
-      margin: 6px 0 0;
-      color: var(--muted);
-      line-height: 1.5;
-    }
-
-    .summary-pill {
+    .pill {
       white-space: nowrap;
       padding: 10px 14px;
       border-radius: 999px;
-      background: rgba(255, 255, 255, 0.05);
       border: 1px solid rgba(255, 255, 255, 0.08);
+      background: rgba(255, 255, 255, 0.04);
       color: var(--muted);
-      font-size: 0.95rem;
+      font-size: 0.94rem;
     }
 
-    .gallery-wrap {
+    .results-scroll {
       flex: 1;
       min-height: 0;
       overflow-y: auto;
-      padding-right: 4px;
     }
 
-    .empty-state {
-      height: 100%;
+    .empty {
       min-height: 280px;
+      height: 100%;
       display: grid;
       place-items: center;
       text-align: center;
-      padding: 28px;
+      border-radius: var(--radius-lg);
       border: 1px dashed rgba(255, 255, 255, 0.14);
-      border-radius: var(--radius-md);
-      color: var(--muted);
       background: rgba(255, 255, 255, 0.02);
+      color: var(--muted);
+      padding: 28px;
+      line-height: 1.6;
     }
 
     .gallery {
       display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+      grid-template-columns: repeat(auto-fill, minmax(230px, 1fr));
       gap: 16px;
     }
 
     .card {
       overflow: hidden;
-      border-radius: var(--radius-md);
-      background: rgba(255, 255, 255, 0.04);
+      border-radius: var(--radius-lg);
       border: 1px solid rgba(255, 255, 255, 0.08);
+      background: rgba(255, 255, 255, 0.04);
     }
 
     .card img {
-      display: block;
       width: 100%;
+      display: block;
       aspect-ratio: 1 / 1;
       object-fit: cover;
-      background: #091217;
+      background: var(--bg-soft);
     }
 
     .card-body {
       padding: 14px;
+      display: grid;
+      gap: 8px;
     }
 
-    .card-title {
-      margin: 0 0 8px;
-      font-size: 0.95rem;
+    .file-name {
+      margin: 0;
+      font-size: 0.96rem;
       word-break: break-word;
     }
 
-    .card-result {
+    .result-label {
       margin: 0;
       color: var(--muted);
       line-height: 1.45;
     }
 
-    @media (max-width: 960px) {
-      .app-shell {
+    @media (max-width: 1100px) {
+      .hero,
+      .workspace {
         grid-template-columns: 1fr;
       }
 
-      .sidebar,
-      .main {
-        min-height: auto;
-      }
-
-      .intro {
-        max-width: none;
-      }
-
-      .status-panel {
-        margin-top: 20px;
+      .hero-points {
+        grid-template-columns: 1fr;
       }
     }
 
-    @media (max-width: 640px) {
-      .app-shell {
-        gap: 14px;
+    @media (max-width: 700px) {
+      .page {
         padding: 14px;
+        gap: 14px;
       }
 
-      .sidebar,
-      .main {
+      .hero,
+      .controls,
+      .results {
         padding: 18px;
-        border-radius: 22px;
       }
 
-      .actions {
+      .button-row {
         grid-template-columns: 1fr;
       }
 
-      .main-header {
+      .results-top {
         flex-direction: column;
         align-items: stretch;
-      }
-
-      .summary-pill {
-        white-space: normal;
       }
 
       .gallery {
         grid-template-columns: 1fr;
       }
-
-      .empty-state {
-        min-height: 220px;
-        padding: 20px;
-      }
     }
   </style>
 </head>
 <body>
-  <div class="app-shell">
-    <aside class="panel sidebar">
-      <div>
-        <p class="eyebrow">Waste Analysis</p>
-        <h1>Trash Detection Dashboard</h1>
-        <p class="intro">
-          Upload one image or an entire folder, run inference, and review annotated results in a full-screen layout that scales across desktop and mobile.
-        </p>
-      </div>
-
-      <div class="control-group">
-        <label class="upload-card">
-          <span>Select image files</span>
-          <small>Pick one or more images from your device.</small>
-          <input type="file" id="files" multiple accept="image/*">
-        </label>
-
-        <label class="upload-card">
-          <span>Select a folder</span>
-          <small>Import a whole directory of images in one pass.</small>
-          <input type="file" id="folder" webkitdirectory multiple accept="image/*">
-        </label>
-      </div>
-
-      <div class="actions">
-        <button class="run" type="button" onclick="run()">Run Inference</button>
-        <button class="clear" type="button" onclick="clearAll()">Clear</button>
-      </div>
-
-      <div class="status-panel">
-        <span class="status-label">Status</span>
-        <div class="status" id="status">Choose files to begin.</div>
-      </div>
-    </aside>
-
-    <main class="panel main">
-      <div class="main-header">
+  <div class="page">
+    <section class="panel hero">
+      <div class="hero-copy">
         <div>
-          <h2>Results</h2>
-          <p>Annotated predictions appear here after each upload is processed.</p>
+          <p class="kicker">Deployable Prototype</p>
+          <h1>Capture or upload. Run inference. Review instantly.</h1>
         </div>
-        <div class="summary-pill" id="summary">0 files selected</div>
+        <p class="lede">
+          This version is shaped like a real user-facing web app: no login for now, just a clear flow for taking a photo, uploading images, and seeing annotated results from the inference API.
+        </p>
+        <div class="hero-points">
+          <div class="point">
+            <strong>Camera ready</strong>
+            <span>Users can open the device camera directly from the browser file picker.</span>
+          </div>
+          <div class="point">
+            <strong>Batch upload</strong>
+            <span>Single images, multiple files, and folders can all be queued for inference.</span>
+          </div>
+          <div class="point">
+            <strong>Production shape</strong>
+            <span>Layout, messaging, and result handling are structured for a deployable frontend.</span>
+          </div>
+        </div>
       </div>
 
-      <div class="gallery-wrap">
-        <div class="empty-state" id="emptyState">
-          Upload files and run inference to populate the results gallery.
+      <aside class="hero-card">
+        <h2>Session Snapshot</h2>
+        <p>Use this as a hosted inference interface while the backend stays separate from GitHub Pages.</p>
+        <div class="metrics">
+          <div class="metric">
+            <span>Authentication</span>
+            <strong>Disabled</strong>
+          </div>
+          <div class="metric">
+            <span>Capture options</span>
+            <strong>Camera + Upload</strong>
+          </div>
+          <div class="metric">
+            <span>Inference mode</span>
+            <strong>Live API</strong>
+          </div>
         </div>
-        <div class="gallery" id="gallery"></div>
-      </div>
-    </main>
+      </aside>
+    </section>
+
+    <section class="workspace">
+      <aside class="panel controls">
+        <div class="workspace-head">
+          <h2>Start Inference</h2>
+          <p>Choose how users submit images. Mobile users can take a fresh photo, while desktop users can upload existing files or folders.</p>
+        </div>
+
+        <div class="action-card">
+          <h3>Take a photo</h3>
+          <p>Best for field use on mobile. This opens the device camera when supported by the browser.</p>
+          <input type="file" id="cameraInput" accept="image/*" capture="environment">
+        </div>
+
+        <div class="action-card">
+          <h3>Upload image files</h3>
+          <p>Select one or more existing images from the device.</p>
+          <input type="file" id="filesInput" multiple accept="image/*">
+        </div>
+
+        <div class="action-card">
+          <h3>Upload a folder</h3>
+          <p>Queue a larger set of images for review in one run.</p>
+          <input type="file" id="folderInput" webkitdirectory multiple accept="image/*">
+        </div>
+
+        <div class="button-row">
+          <button class="primary" type="button" onclick="runInference()">Run Inference</button>
+          <button class="danger" type="button" onclick="clearAll()">Clear Session</button>
+        </div>
+
+        <div class="status-panel">
+          <p class="status-label">Status</p>
+          <p class="status-text" id="status">Waiting for images.</p>
+        </div>
+      </aside>
+
+      <main class="panel results">
+        <div class="results-top">
+          <div class="workspace-head">
+            <h2>Results Gallery</h2>
+            <p>Each processed image returns an annotated preview and a prediction label.</p>
+          </div>
+          <div class="pill" id="summary">0 files queued</div>
+        </div>
+
+        <div class="results-scroll">
+          <div class="empty" id="emptyState">
+            No images queued yet. Use the camera or upload controls to begin.
+          </div>
+          <div class="gallery" id="gallery"></div>
+        </div>
+      </main>
+    </section>
   </div>
 
   <script>
     const API = "https://corsage-drainable-trimmer.ngrok-free.dev/predict";
 
-    let files = [];
-
-    const fileInput = document.getElementById("files");
-    const folderInput = document.getElementById("folder");
-    const gallery = document.getElementById("gallery");
-    const status = document.getElementById("status");
+    const cameraInput = document.getElementById("cameraInput");
+    const filesInput = document.getElementById("filesInput");
+    const folderInput = document.getElementById("folderInput");
+    const statusText = document.getElementById("status");
     const summary = document.getElementById("summary");
+    const gallery = document.getElementById("gallery");
     const emptyState = document.getElementById("emptyState");
 
-    fileInput.onchange = (event) => addFiles(event.target.files);
-    folderInput.onchange = (event) => addFiles(event.target.files);
+    let queue = [];
 
-    function updateSummary() {
-      const count = files.length;
-      summary.textContent = count === 1 ? "1 file selected" : count + " files selected";
-    }
+    cameraInput.addEventListener("change", (event) => addFiles(event.target.files, "camera"));
+    filesInput.addEventListener("change", (event) => addFiles(event.target.files, "upload"));
+    folderInput.addEventListener("change", (event) => addFiles(event.target.files, "folder"));
 
-    function setStatus(message) {
-      status.textContent = message;
-    }
-
-    function toggleEmptyState() {
-      emptyState.style.display = gallery.children.length ? "none" : "grid";
-    }
-
-    function addFiles(fileList) {
+    function addFiles(fileList, source) {
       const incoming = Array.from(fileList).filter((file) => file.type.startsWith("image/"));
-      files = files.concat(incoming);
-      updateSummary();
 
       if (!incoming.length) {
         setStatus("No image files were added.");
         return;
       }
 
-      const added = incoming.length;
-      const total = files.length;
-      setStatus((added === 1 ? "1 image added. " : added + " images added. ") + total + " ready.");
+      queue = queue.concat(incoming);
+      updateSummary();
+
+      const sourceLabel = source === "camera" ? "camera" : source === "folder" ? "folder" : "upload";
+      setStatus(incoming.length + " image(s) added from " + sourceLabel + ". " + queue.length + " queued.");
+    }
+
+    function updateSummary() {
+      summary.textContent = queue.length === 1 ? "1 file queued" : queue.length + " files queued";
+    }
+
+    function setStatus(message) {
+      statusText.textContent = message;
+    }
+
+    function toggleEmptyState() {
+      emptyState.style.display = gallery.children.length ? "none" : "grid";
+    }
+
+    function clearInputs() {
+      cameraInput.value = "";
+      filesInput.value = "";
+      folderInput.value = "";
     }
 
     function clearAll() {
-      files = [];
+      queue = [];
       gallery.innerHTML = "";
-      fileInput.value = "";
-      folderInput.value = "";
+      clearInputs();
       updateSummary();
       toggleEmptyState();
-      setStatus("Selections and results cleared.");
+      setStatus("Session cleared.");
     }
 
-    async function run() {
-      if (!files.length) {
-        setStatus("No files selected.");
+    async function runInference() {
+      if (!queue.length) {
+        setStatus("No files queued.");
         return;
       }
 
       gallery.innerHTML = "";
       toggleEmptyState();
-      setStatus("Processing " + files.length + " file(s)...");
+      setStatus("Running inference on " + queue.length + " file(s)...");
 
-      const queue = [...files];
+      const items = [...queue];
 
-      for (let index = 0; index < queue.length; index += 1) {
-        const file = queue[index];
+      for (let index = 0; index < items.length; index += 1) {
+        const file = items[index];
         const formData = new FormData();
         formData.append("file", file);
 
-        setStatus("Processing " + (index + 1) + " of " + queue.length + ": " + file.name);
+        setStatus("Processing " + (index + 1) + " of " + items.length + ": " + file.name);
 
         try {
           const response = await fetch(API, { method: "POST", body: formData });
@@ -470,41 +602,40 @@
           }
 
           const data = await response.json();
-          renderCard(file.name, data.image, getLabel(data.bin_detected, data.prediction));
+          renderResult(file.name, data.image, getLabel(data.bin_detected, data.prediction));
         } catch (error) {
-          renderErrorCard(file.name);
+          renderError(file.name);
         }
 
         toggleEmptyState();
       }
 
-      setStatus("Inference complete.");
-      files = [];
+      queue = [];
+      clearInputs();
       updateSummary();
-      fileInput.value = "";
-      folderInput.value = "";
+      setStatus("Inference complete.");
     }
 
-    function renderCard(fileName, imageBase64, label) {
+    function renderResult(fileName, imageBase64, label) {
       const card = document.createElement("article");
       card.className = "card";
       card.innerHTML = `
         <img src="data:image/jpeg;base64,${imageBase64}" alt="Inference result for ${escapeHtml(fileName)}">
         <div class="card-body">
-          <p class="card-title">${escapeHtml(fileName)}</p>
-          <p class="card-result">${escapeHtml(label)}</p>
+          <p class="file-name">${escapeHtml(fileName)}</p>
+          <p class="result-label">${escapeHtml(label)}</p>
         </div>
       `;
       gallery.appendChild(card);
     }
 
-    function renderErrorCard(fileName) {
+    function renderError(fileName) {
       const card = document.createElement("article");
       card.className = "card";
       card.innerHTML = `
         <div class="card-body">
-          <p class="card-title">${escapeHtml(fileName)}</p>
-          <p class="card-result">Unable to process this file.</p>
+          <p class="file-name">${escapeHtml(fileName)}</p>
+          <p class="result-label">Unable to process this image.</p>
         </div>
       `;
       gallery.appendChild(card);
