@@ -72,6 +72,9 @@
       justify-content: space-between;
       gap: 16px;
       padding: 10px 14px;
+      background: rgba(7, 9, 11, 0.72);
+      border-color: rgba(255, 255, 255, 0.2);
+      backdrop-filter: blur(14px);
     }
 
     .brand {
@@ -92,7 +95,7 @@
       padding: 10px 14px;
       border-radius: 10px;
       border: 1px solid var(--border-soft);
-      background: rgba(255, 255, 255, 0.08);
+      background: rgba(255, 255, 255, 0.12);
       color: var(--text);
       font-size: 0.92rem;
       cursor: pointer;
@@ -314,7 +317,7 @@
       border: 1px solid var(--border);
       border-radius: 10px;
       padding: 10px 14px;
-      background: rgba(255, 255, 255, 0.16);
+      background: rgba(255, 255, 255, 0.28);
       color: var(--text);
       display: inline-flex;
       align-items: center;
@@ -500,6 +503,25 @@
       gap: 6px;
     }
 
+    .card-actions {
+      display: flex;
+      justify-content: flex-end;
+      margin-top: 4px;
+    }
+
+    .download-link {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: 8px 10px;
+      border: 1px solid rgba(255, 255, 255, 0.14);
+      border-radius: 8px;
+      background: rgba(255, 255, 255, 0.08);
+      color: var(--text);
+      text-decoration: none;
+      font-size: 0.84rem;
+    }
+
     .image-modal {
       position: fixed;
       inset: 0;
@@ -544,6 +566,12 @@
       border-radius: 8px;
       background: rgba(255, 255, 255, 0.08);
       color: var(--text);
+    }
+
+    .image-modal-actions {
+      display: flex;
+      align-items: center;
+      gap: 10px;
     }
 
     .image-modal img {
@@ -732,7 +760,10 @@
     <div class="image-modal-dialog">
       <div class="image-modal-top">
         <div class="image-modal-title" id="imageModalTitle">Image preview</div>
-        <button class="image-modal-close" type="button" id="imageModalClose">Close</button>
+        <div class="image-modal-actions">
+          <a class="download-link" id="imageModalDownload" href="#" download="result.jpg">Download</a>
+          <button class="image-modal-close" type="button" id="imageModalClose">Close</button>
+        </div>
       </div>
       <img id="imageModalImage" alt="Expanded result preview">
     </div>
@@ -758,6 +789,7 @@
     const imageModal = document.getElementById("imageModal");
     const imageModalImage = document.getElementById("imageModalImage");
     const imageModalTitle = document.getElementById("imageModalTitle");
+    const imageModalDownload = document.getElementById("imageModalDownload");
     const imageModalClose = document.getElementById("imageModalClose");
 
     let queue = [];
@@ -877,13 +909,17 @@
     }
 
     function appendResultCard(item, imageBase64, label) {
+      const resultSrc = "data:image/jpeg;base64," + imageBase64;
       const card = document.createElement("article");
       card.className = "card";
       card.innerHTML = `
-        <img src="data:image/jpeg;base64,${imageBase64}" alt="Inference result for ${escapeHtml(item.file.name)}">
+        <img src="${resultSrc}" alt="Inference result for ${escapeHtml(item.file.name)}">
         <div class="card-body">
           <div class="file-name">${escapeHtml(item.file.name)}</div>
           <div class="result-label">${escapeHtml(label)}</div>
+          <div class="card-actions">
+            <a class="download-link" href="${resultSrc}" download="${escapeHtml(item.file.name)}">Download</a>
+          </div>
         </div>
       `;
       const image = card.querySelector("img");
@@ -986,6 +1022,8 @@
     function openImageModal(src, title) {
       imageModalImage.src = src;
       imageModalTitle.textContent = title;
+      imageModalDownload.href = src;
+      imageModalDownload.download = title;
       imageModal.classList.add("is-open");
       imageModal.setAttribute("aria-hidden", "false");
     }
@@ -994,6 +1032,7 @@
       imageModal.classList.remove("is-open");
       imageModal.setAttribute("aria-hidden", "true");
       imageModalImage.removeAttribute("src");
+      imageModalDownload.href = "#";
     }
 
     cameraInput.addEventListener("change", () => updateSelectedText(cameraInput, cameraFileText, "No file selected."));
