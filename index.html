@@ -108,7 +108,7 @@
     .workspace {
       min-height: 0;
       display: grid;
-      grid-template-columns: minmax(280px, 340px) minmax(0, 1fr);
+      grid-template-columns: 1fr;
       gap: 18px;
     }
 
@@ -121,6 +121,18 @@
     .sidebar {
       display: flex;
       flex-direction: column;
+      gap: 14px;
+    }
+
+    .input-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 14px;
+      align-items: start;
+    }
+
+    .input-actions {
+      display: grid;
       gap: 14px;
     }
 
@@ -255,7 +267,6 @@
     }
 
     .status-panel {
-      margin-top: auto;
       padding: 15px 16px;
       border-radius: var(--radius-lg);
       border: 1px solid var(--border-soft);
@@ -361,14 +372,13 @@
     }
 
     @media (max-width: 980px) {
-      .hero,
-      .workspace {
-        grid-template-columns: 1fr;
-      }
-
       .hero {
         flex-direction: column;
         align-items: center;
+      }
+
+      .input-grid {
+        grid-template-columns: 1fr;
       }
     }
 
@@ -418,56 +428,60 @@
           <p>Choose a photo source, then run inference.</p>
         </div>
 
-        <label class="action-card">
-          <div class="action-top">
-            <div class="icon-wrap" aria-hidden="true">
-              <svg viewBox="0 0 24 24" fill="none" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
-                <path d="M4 8h3l1.8-2h6.4L17 8h3"></path>
-                <path d="M5 8h14v11a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2Z"></path>
-                <circle cx="12" cy="13" r="3.5"></circle>
-              </svg>
+        <div class="input-grid">
+          <label class="action-card">
+            <div class="action-top">
+              <div class="icon-wrap" aria-hidden="true">
+                <svg viewBox="0 0 24 24" fill="none" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M4 8h3l1.8-2h6.4L17 8h3"></path>
+                  <path d="M5 8h14v11a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2Z"></path>
+                  <circle cx="12" cy="13" r="3.5"></circle>
+                </svg>
+              </div>
+              <div class="action-copy">
+                <h3>Take a photo</h3>
+                <p>Opens the camera on supported mobile browsers.</p>
+              </div>
             </div>
-            <div class="action-copy">
-              <h3>Take a photo</h3>
-              <p>Opens the camera on supported mobile browsers.</p>
+            <div class="file-control">
+              <span class="file-button">Capture</span>
+              <span class="file-name-text" id="cameraFileText">No file selected.</span>
+              <input type="file" id="cameraInput" accept="image/*" capture="environment">
             </div>
-          </div>
-          <div class="file-control">
-            <span class="file-button">Capture</span>
-            <span class="file-name-text" id="cameraFileText">No file selected.</span>
-            <input type="file" id="cameraInput" accept="image/*" capture="environment">
-          </div>
-        </label>
+          </label>
 
-        <label class="action-card">
-          <div class="action-top">
-            <div class="icon-wrap" aria-hidden="true">
-              <svg viewBox="0 0 24 24" fill="none" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
-                <path d="M12 16V5"></path>
-                <path d="m7 10 5-5 5 5"></path>
-                <path d="M5 19h14"></path>
-              </svg>
+          <label class="action-card">
+            <div class="action-top">
+              <div class="icon-wrap" aria-hidden="true">
+                <svg viewBox="0 0 24 24" fill="none" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M12 16V5"></path>
+                  <path d="m7 10 5-5 5 5"></path>
+                  <path d="M5 19h14"></path>
+                </svg>
+              </div>
+              <div class="action-copy">
+                <h3>Upload images</h3>
+                <p>Select one or more image files from the device.</p>
+              </div>
             </div>
-            <div class="action-copy">
-              <h3>Upload images</h3>
-              <p>Select one or more image files from the device.</p>
+            <div class="file-control">
+              <span class="file-button">Browse</span>
+              <span class="file-name-text" id="filesFileText">No files selected.</span>
+              <input type="file" id="filesInput" multiple accept="image/*">
+            </div>
+          </label>
+
+          <div class="input-actions">
+            <div class="button-row">
+              <button class="primary" type="button" onclick="runInference()">Run inference</button>
+              <button class="ghost" type="button" onclick="clearAll()">Clear</button>
+            </div>
+
+            <div class="status-panel">
+              <div class="status-label">Status</div>
+              <div class="status-text" id="status">Waiting for images.</div>
             </div>
           </div>
-          <div class="file-control">
-            <span class="file-button">Browse</span>
-            <span class="file-name-text" id="filesFileText">No files selected.</span>
-            <input type="file" id="filesInput" multiple accept="image/*">
-          </div>
-        </label>
-
-        <div class="button-row">
-          <button class="primary" type="button" onclick="runInference()">Run inference</button>
-          <button class="ghost" type="button" onclick="clearAll()">Clear</button>
-        </div>
-
-        <div class="status-panel">
-          <div class="status-label">Status</div>
-          <div class="status-text" id="status">Waiting for images.</div>
         </div>
       </aside>
 
