@@ -515,8 +515,15 @@
         return;
       }
 
-      queue = queue.concat(incoming);
+      const queuedItems = incoming.map((file) => ({
+        file,
+        previewUrl: URL.createObjectURL(file)
+      }));
+
+      queue = queue.concat(queuedItems);
+      renderQueuedItems(queuedItems);
       updateSummary();
+      toggleEmptyState();
 
       const sourceLabel = source === "camera" ? "camera" : "upload";
       setStatus(incoming.length + " image(s) added from " + sourceLabel + ". " + queue.length + " queued.");
@@ -558,6 +565,7 @@
     }
 
     function clearAll() {
+      releasePreviewUrls();
       queue = [];
       gallery.innerHTML = "";
       clearInputs();
@@ -572,14 +580,13 @@
         return;
       }
 
-      gallery.innerHTML = "";
-      toggleEmptyState();
       setStatus("Running inference on " + queue.length + " file(s)...");
 
       const items = [...queue];
 
       for (let index = 0; index < items.length; index += 1) {
-        const file = items[index];
+        const item = items[index];
+        const file = item.file;
         const formData = new FormData();
         formData.append("file", file);
 
@@ -593,43 +600,72 @@
           }
 
           const data = await response.json();
-          renderResult(file.name, data.image, getLabel(data.bin_detected, data.prediction));
+          updateResultCard(item, data.image, getLabel(data.bin_detected, data.prediction));
         } catch (error) {
-          renderError(file.name);
+          updateErrorCard(item);
         }
-
-        toggleEmptyState();
       }
 
+      releasePreviewUrls();
       queue = [];
       clearInputs();
       updateSummary();
       setStatus("Inference complete.");
     }
 
-    function renderResult(fileName, imageBase64, label) {
-      const card = document.createElement("article");
-      card.className = "card";
-      card.innerHTML = `
-        <img src="data:image/jpeg;base64,${imageBase64}" alt="Inference result for ${escapeHtml(fileName)}">
-        <div class="card-body">
-          <div class="file-name">${escapeHtml(fileName)}</div>
-          <div class="result-label">${escapeHtml(label)}</div>
-        </div>
-      `;
-      gallery.appendChild(card);
+    function renderQueuedItems(items) {
+      for (const item of items) {
+        const card = document.createElement("article");
+        card.className = "card";
+        card.dataset.fileName = item.file.name;
+        card.innerHTML = `
+          <img src="${item.previewUrl}" alt="Preview for ${escapeHtml(item.file.name)}">
+          <div class="card-body">
+            <div class="file-name">${escapeHtml(item.file.name)}</div>
+            <div class="result-label">Preview ready. Run inference to analyze this image.</div>
+          </div>
+        `;
+        gallery.appendChild(card);
+        item.card = card;
+      }
     }
 
-    function renderError(fileName) {
-      const card = document.createElement("article");
-      card.className = "card";
-      card.innerHTML = `
-        <div class="card-body">
-          <div class="file-name">${escapeHtml(fileName)}</div>
-          <div class="result-label">Unable to process this image.</div>
-        </div>
-      `;
-      gallery.appendChild(card);
+    function updateResultCard(item, imageBase64, label) {
+      if (!item.card) {
+        return;
+      }
+
+      const image = item.card.querySelector("img");
+      const resultLabel = item.card.querySelector(".result-label");
+
+      if (image) {
+        image.src = "data:image/jpeg;base64," + imageBase64;
+        image.alt = "Inference result for " + item.file.name;
+      }
+
+      if (resultLabel) {
+        resultLabel.textContent = label;
+      }
+    }
+
+    function updateErrorCard(item) {
+      if (!item.card) {
+        return;
+      }
+
+      const resultLabel = item.card.querySelector(".result-label");
+
+      if (resultLabel) {
+        resultLabel.textContent = "Unable to process this image.";
+      }
+    }
+
+    function releasePreviewUrls() {
+      for (const item of queue) {
+        if (item.previewUrl) {
+          URL.revokeObjectURL(item.previewUrl);
+        }
+      }
     }
 
     function getLabel(binDetected, prediction) {
