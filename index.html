@@ -3,24 +3,28 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Trash Detection Web Interface</title>
+  <title>Trash Detection</title>
   <style>
     :root {
       color-scheme: dark;
-      --bg: #051017;
-      --bg-soft: #0a1c26;
-      --panel: rgba(7, 24, 31, 0.88);
-      --panel-strong: rgba(10, 29, 37, 0.95);
-      --border: rgba(181, 240, 220, 0.14);
-      --text: #f4fcf9;
-      --muted: #9abcb2;
-      --accent: #c0ff52;
-      --accent-strong: #e1ff9b;
-      --danger: #ff7a66;
-      --shadow: 0 28px 60px rgba(0, 0, 0, 0.3);
-      --radius-xl: 30px;
+      --bg: #050709;
+      --bg-soft: #0a0e12;
+      --surface: rgba(11, 15, 19, 0.92);
+      --surface-strong: rgba(15, 20, 25, 0.98);
+      --surface-faint: rgba(255, 255, 255, 0.025);
+      --border: rgba(255, 255, 255, 0.08);
+      --border-soft: rgba(255, 255, 255, 0.05);
+      --text: #f3f5f7;
+      --muted: #97a0ab;
+      --accent: #d7dde5;
+      --accent-strong: #ffffff;
+      --success: #c9ff5a;
+      --danger: #ff8a7a;
+      --shadow: 0 28px 80px rgba(0, 0, 0, 0.45);
+      --radius-xl: 28px;
       --radius-lg: 22px;
       --radius-md: 16px;
+      --radius-sm: 12px;
     }
 
     * {
@@ -31,12 +35,11 @@
     body {
       margin: 0;
       min-height: 100%;
-      font-family: "Segoe UI", "Helvetica Neue", sans-serif;
       background:
-        radial-gradient(circle at top left, rgba(192, 255, 82, 0.16), transparent 22%),
-        radial-gradient(circle at bottom right, rgba(76, 182, 255, 0.14), transparent 28%),
-        linear-gradient(180deg, #07131a 0%, #03090d 100%);
+        radial-gradient(circle at top, rgba(255, 255, 255, 0.04), transparent 28%),
+        linear-gradient(180deg, #07090c 0%, #040506 100%);
       color: var(--text);
+      font-family: "Segoe UI", "Helvetica Neue", Arial, sans-serif;
     }
 
     body {
@@ -45,188 +48,171 @@
 
     .page {
       min-height: 100dvh;
-      display: flex;
-      flex-direction: column;
-      padding: 20px;
-      gap: 20px;
+      display: grid;
+      grid-template-rows: auto 1fr;
+      gap: 18px;
+      padding: 18px;
     }
 
     .panel {
+      background: var(--surface);
       border: 1px solid var(--border);
       border-radius: var(--radius-xl);
-      background: var(--panel);
-      backdrop-filter: blur(14px);
       box-shadow: var(--shadow);
+      backdrop-filter: blur(10px);
     }
 
     .hero {
-      display: grid;
-      grid-template-columns: minmax(0, 1.3fr) minmax(280px, 0.9fr);
-      gap: 20px;
-      padding: 24px;
+      display: flex;
+      align-items: end;
+      justify-content: space-between;
+      gap: 24px;
+      padding: 24px 26px;
     }
 
     .hero-copy {
-      display: flex;
-      flex-direction: column;
-      justify-content: space-between;
-      gap: 18px;
+      max-width: 720px;
     }
 
-    .kicker {
-      margin: 0;
-      color: var(--accent);
+    .eyebrow {
+      margin: 0 0 10px;
+      color: var(--muted);
+      font-size: 0.74rem;
+      letter-spacing: 0.18em;
       text-transform: uppercase;
-      letter-spacing: 0.16em;
-      font-size: 0.82rem;
       font-weight: 700;
     }
 
-    h1 {
+    h1,
+    h2,
+    h3,
+    p {
       margin: 0;
-      font-size: clamp(2.2rem, 5vw, 4.8rem);
+    }
+
+    h1 {
+      font-size: clamp(2rem, 5vw, 4.4rem);
       line-height: 0.94;
+      letter-spacing: -0.04em;
       max-width: 10ch;
     }
 
-    .lede {
-      margin: 0;
-      max-width: 58ch;
-      line-height: 1.7;
+    .hero-copy p {
+      margin-top: 14px;
+      max-width: 54ch;
       color: var(--muted);
-      font-size: 1.02rem;
-    }
-
-    .hero-points {
-      display: grid;
-      grid-template-columns: repeat(3, minmax(0, 1fr));
-      gap: 12px;
-    }
-
-    .point {
-      padding: 14px;
-      border-radius: var(--radius-md);
-      background: rgba(255, 255, 255, 0.03);
-      border: 1px solid rgba(255, 255, 255, 0.07);
-    }
-
-    .point strong {
-      display: block;
-      margin-bottom: 6px;
+      line-height: 1.7;
       font-size: 0.98rem;
     }
 
-    .point span {
-      color: var(--muted);
-      font-size: 0.92rem;
-      line-height: 1.4;
-    }
-
-    .hero-card {
-      padding: 20px;
-      border-radius: var(--radius-lg);
-      background:
-        linear-gradient(180deg, rgba(192, 255, 82, 0.12), transparent 55%),
-        var(--panel-strong);
-      border: 1px solid rgba(192, 255, 82, 0.16);
-      display: grid;
-      gap: 16px;
-      align-content: start;
-    }
-
-    .hero-card h2,
-    .workspace-head h2 {
-      margin: 0;
-      font-size: 1.35rem;
-    }
-
-    .hero-card p,
-    .workspace-head p {
-      margin: 0;
-      color: var(--muted);
-      line-height: 1.6;
-    }
-
-    .metrics {
-      display: grid;
-      gap: 12px;
-    }
-
-    .metric {
+    .hero-meta {
       display: flex;
-      justify-content: space-between;
-      gap: 12px;
-      align-items: baseline;
-      padding: 12px 14px;
-      border-radius: var(--radius-md);
-      background: rgba(255, 255, 255, 0.04);
+      gap: 10px;
+      flex-wrap: wrap;
+      justify-content: flex-end;
     }
 
-    .metric span {
+    .meta-chip {
+      padding: 10px 14px;
+      border-radius: 999px;
+      background: var(--surface-faint);
+      border: 1px solid var(--border-soft);
       color: var(--muted);
-    }
-
-    .metric strong {
-      font-size: 1.05rem;
+      font-size: 0.9rem;
     }
 
     .workspace {
-      flex: 1;
       min-height: 0;
       display: grid;
-      grid-template-columns: minmax(320px, 360px) minmax(0, 1fr);
-      gap: 20px;
+      grid-template-columns: minmax(280px, 340px) minmax(0, 1fr);
+      gap: 18px;
     }
 
-    .controls,
-    .results {
+    .sidebar,
+    .main {
       min-height: 0;
       padding: 22px;
     }
 
-    .controls {
+    .sidebar {
       display: flex;
       flex-direction: column;
-      gap: 18px;
+      gap: 14px;
     }
 
-    .workspace-head {
+    .section-head {
       display: grid;
-      gap: 8px;
+      gap: 6px;
+    }
+
+    .section-head h2 {
+      font-size: 1.35rem;
+      letter-spacing: -0.02em;
+    }
+
+    .section-head p {
+      color: var(--muted);
+      line-height: 1.55;
+      font-size: 0.94rem;
     }
 
     .action-card {
-      padding: 18px;
+      padding: 16px;
       border-radius: var(--radius-lg);
-      border: 1px solid rgba(255, 255, 255, 0.08);
-      background: rgba(255, 255, 255, 0.03);
+      border: 1px solid var(--border-soft);
+      background: var(--surface-faint);
       display: grid;
       gap: 12px;
     }
 
-    .action-card h3 {
-      margin: 0;
-      font-size: 1.02rem;
+    .action-top {
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
     }
 
-    .action-card p {
-      margin: 0;
+    .icon-wrap {
+      width: 40px;
+      height: 40px;
+      border-radius: 14px;
+      display: grid;
+      place-items: center;
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid var(--border-soft);
+      color: var(--accent);
+      flex: 0 0 auto;
+    }
+
+    .icon-wrap svg {
+      width: 18px;
+      height: 18px;
+      stroke: currentColor;
+    }
+
+    .action-copy h3 {
+      font-size: 1rem;
+      letter-spacing: -0.01em;
+    }
+
+    .action-copy p {
+      margin-top: 4px;
       color: var(--muted);
+      font-size: 0.9rem;
       line-height: 1.5;
-      font-size: 0.94rem;
     }
 
     input[type="file"] {
       width: 100%;
       color: var(--muted);
+      font-size: 0.9rem;
     }
 
     input[type="file"]::file-selector-button {
       margin-right: 12px;
-      border: none;
+      border: 1px solid var(--border);
       border-radius: 999px;
       padding: 10px 14px;
-      background: rgba(255, 255, 255, 0.1);
+      background: rgba(255, 255, 255, 0.04);
       color: var(--text);
       cursor: pointer;
     }
@@ -234,87 +220,80 @@
     .button-row {
       display: grid;
       grid-template-columns: repeat(2, minmax(0, 1fr));
-      gap: 12px;
+      gap: 10px;
     }
 
     button {
-      min-height: 52px;
-      border: none;
+      min-height: 50px;
       border-radius: 999px;
-      font-size: 1rem;
-      font-weight: 700;
+      border: 1px solid var(--border);
       cursor: pointer;
-      transition: transform 0.18s ease, filter 0.18s ease;
+      font-size: 0.96rem;
+      font-weight: 700;
+      transition: background 0.18s ease, transform 0.18s ease, border-color 0.18s ease;
     }
 
     button:hover {
       transform: translateY(-1px);
-      filter: brightness(1.05);
     }
 
     .primary {
-      background: linear-gradient(135deg, var(--accent), var(--accent-strong));
-      color: #122100;
+      background: var(--success);
+      border-color: rgba(201, 255, 90, 0.34);
+      color: #121905;
     }
 
-    .secondary {
-      background: rgba(255, 255, 255, 0.06);
+    .ghost {
+      background: rgba(255, 255, 255, 0.03);
       color: var(--text);
-      border: 1px solid rgba(255, 255, 255, 0.08);
-    }
-
-    .danger {
-      background: rgba(255, 122, 102, 0.16);
-      color: #ffd7d1;
-      border: 1px solid rgba(255, 122, 102, 0.28);
     }
 
     .status-panel {
       margin-top: auto;
-      padding: 16px;
+      padding: 15px 16px;
       border-radius: var(--radius-lg);
-      background: var(--panel-strong);
-      border: 1px solid rgba(255, 255, 255, 0.08);
+      border: 1px solid var(--border-soft);
+      background: var(--surface-strong);
       display: grid;
       gap: 8px;
     }
 
     .status-label {
-      margin: 0;
-      text-transform: uppercase;
-      font-size: 0.78rem;
-      letter-spacing: 0.12em;
       color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 0.16em;
+      font-size: 0.72rem;
       font-weight: 700;
     }
 
     .status-text {
-      margin: 0;
+      color: var(--accent);
       line-height: 1.5;
+      font-size: 0.94rem;
     }
 
-    .results {
+    .main {
       display: flex;
       flex-direction: column;
       overflow: hidden;
     }
 
-    .results-top {
+    .main-top {
       display: flex;
+      align-items: end;
       justify-content: space-between;
       gap: 16px;
-      align-items: end;
       margin-bottom: 18px;
     }
 
-    .pill {
-      white-space: nowrap;
+    .queue-chip {
       padding: 10px 14px;
       border-radius: 999px;
-      border: 1px solid rgba(255, 255, 255, 0.08);
-      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid var(--border-soft);
+      background: rgba(255, 255, 255, 0.03);
       color: var(--muted);
-      font-size: 0.94rem;
+      font-size: 0.9rem;
+      white-space: nowrap;
     }
 
     .results-scroll {
@@ -324,35 +303,35 @@
     }
 
     .empty {
-      min-height: 280px;
+      min-height: 260px;
       height: 100%;
+      border-radius: var(--radius-lg);
+      border: 1px dashed var(--border-soft);
+      background: rgba(255, 255, 255, 0.015);
       display: grid;
       place-items: center;
-      text-align: center;
-      border-radius: var(--radius-lg);
-      border: 1px dashed rgba(255, 255, 255, 0.14);
-      background: rgba(255, 255, 255, 0.02);
-      color: var(--muted);
       padding: 28px;
-      line-height: 1.6;
+      color: var(--muted);
+      text-align: center;
+      line-height: 1.7;
     }
 
     .gallery {
       display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(230px, 1fr));
-      gap: 16px;
+      grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+      gap: 14px;
     }
 
     .card {
       overflow: hidden;
       border-radius: var(--radius-lg);
-      border: 1px solid rgba(255, 255, 255, 0.08);
-      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid var(--border-soft);
+      background: rgba(255, 255, 255, 0.025);
     }
 
     .card img {
-      width: 100%;
       display: block;
+      width: 100%;
       aspect-ratio: 1 / 1;
       object-fit: cover;
       background: var(--bg-soft);
@@ -361,41 +340,45 @@
     .card-body {
       padding: 14px;
       display: grid;
-      gap: 8px;
+      gap: 6px;
     }
 
     .file-name {
-      margin: 0;
-      font-size: 0.96rem;
+      font-size: 0.95rem;
       word-break: break-word;
     }
 
     .result-label {
-      margin: 0;
       color: var(--muted);
+      font-size: 0.9rem;
       line-height: 1.45;
     }
 
-    @media (max-width: 1100px) {
+    @media (max-width: 980px) {
       .hero,
       .workspace {
         grid-template-columns: 1fr;
       }
 
-      .hero-points {
-        grid-template-columns: 1fr;
+      .hero {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+
+      .hero-meta {
+        justify-content: flex-start;
       }
     }
 
-    @media (max-width: 700px) {
+    @media (max-width: 640px) {
       .page {
-        padding: 14px;
-        gap: 14px;
+        padding: 12px;
+        gap: 12px;
       }
 
       .hero,
-      .controls,
-      .results {
+      .sidebar,
+      .main {
         padding: 18px;
       }
 
@@ -403,7 +386,7 @@
         grid-template-columns: 1fr;
       }
 
-      .results-top {
+      .main-top {
         flex-direction: column;
         align-items: stretch;
       }
@@ -416,99 +399,100 @@
 </head>
 <body>
   <div class="page">
-    <section class="panel hero">
+    <header class="panel hero">
       <div class="hero-copy">
-        <div>
-          <p class="kicker">Deployable Prototype</p>
-          <h1>Capture or upload. Run inference. Review instantly.</h1>
-        </div>
-        <p class="lede">
-          This version is shaped like a real user-facing web app: no login for now, just a clear flow for taking a photo, uploading images, and seeing annotated results from the inference API.
+        <p class="eyebrow">Trash Detection</p>
+        <h1>Upload or capture an image for inference.</h1>
+        <p>
+          A minimal, dark interface for quick image submission and clean result review.
         </p>
-        <div class="hero-points">
-          <div class="point">
-            <strong>Camera ready</strong>
-            <span>Users can open the device camera directly from the browser file picker.</span>
-          </div>
-          <div class="point">
-            <strong>Batch upload</strong>
-            <span>Single images, multiple files, and folders can all be queued for inference.</span>
-          </div>
-          <div class="point">
-            <strong>Production shape</strong>
-            <span>Layout, messaging, and result handling are structured for a deployable frontend.</span>
-          </div>
-        </div>
       </div>
-
-      <aside class="hero-card">
-        <h2>Session Snapshot</h2>
-        <p>Use this as a hosted inference interface while the backend stays separate from GitHub Pages.</p>
-        <div class="metrics">
-          <div class="metric">
-            <span>Authentication</span>
-            <strong>Disabled</strong>
-          </div>
-          <div class="metric">
-            <span>Capture options</span>
-            <strong>Camera + Upload</strong>
-          </div>
-          <div class="metric">
-            <span>Inference mode</span>
-            <strong>Live API</strong>
-          </div>
-        </div>
-      </aside>
-    </section>
+      <div class="hero-meta">
+        <div class="meta-chip">No login</div>
+        <div class="meta-chip">Camera + upload</div>
+        <div class="meta-chip">Live API</div>
+      </div>
+    </header>
 
     <section class="workspace">
-      <aside class="panel controls">
-        <div class="workspace-head">
-          <h2>Start Inference</h2>
-          <p>Choose how users submit images. Mobile users can take a fresh photo, while desktop users can upload existing files or folders.</p>
+      <aside class="panel sidebar">
+        <div class="section-head">
+          <h2>Input</h2>
+          <p>Choose a photo source, then run inference.</p>
         </div>
 
-        <div class="action-card">
-          <h3>Take a photo</h3>
-          <p>Best for field use on mobile. This opens the device camera when supported by the browser.</p>
+        <label class="action-card">
+          <div class="action-top">
+            <div class="icon-wrap" aria-hidden="true">
+              <svg viewBox="0 0 24 24" fill="none" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M4 8h3l1.8-2h6.4L17 8h3"></path>
+                <path d="M5 8h14v11a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2Z"></path>
+                <circle cx="12" cy="13" r="3.5"></circle>
+              </svg>
+            </div>
+            <div class="action-copy">
+              <h3>Take a photo</h3>
+              <p>Opens the camera on supported mobile browsers.</p>
+            </div>
+          </div>
           <input type="file" id="cameraInput" accept="image/*" capture="environment">
-        </div>
+        </label>
 
-        <div class="action-card">
-          <h3>Upload image files</h3>
-          <p>Select one or more existing images from the device.</p>
+        <label class="action-card">
+          <div class="action-top">
+            <div class="icon-wrap" aria-hidden="true">
+              <svg viewBox="0 0 24 24" fill="none" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M12 16V5"></path>
+                <path d="m7 10 5-5 5 5"></path>
+                <path d="M5 19h14"></path>
+              </svg>
+            </div>
+            <div class="action-copy">
+              <h3>Upload images</h3>
+              <p>Select one or more image files from the device.</p>
+            </div>
+          </div>
           <input type="file" id="filesInput" multiple accept="image/*">
-        </div>
+        </label>
 
-        <div class="action-card">
-          <h3>Upload a folder</h3>
-          <p>Queue a larger set of images for review in one run.</p>
+        <label class="action-card">
+          <div class="action-top">
+            <div class="icon-wrap" aria-hidden="true">
+              <svg viewBox="0 0 24 24" fill="none" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M3 7.5A2.5 2.5 0 0 1 5.5 5H10l2 2h6.5A2.5 2.5 0 0 1 21 9.5v8A2.5 2.5 0 0 1 18.5 20h-13A2.5 2.5 0 0 1 3 17.5Z"></path>
+              </svg>
+            </div>
+            <div class="action-copy">
+              <h3>Upload folder</h3>
+              <p>Queue a larger batch of images in one go.</p>
+            </div>
+          </div>
           <input type="file" id="folderInput" webkitdirectory multiple accept="image/*">
-        </div>
+        </label>
 
         <div class="button-row">
-          <button class="primary" type="button" onclick="runInference()">Run Inference</button>
-          <button class="danger" type="button" onclick="clearAll()">Clear Session</button>
+          <button class="primary" type="button" onclick="runInference()">Run inference</button>
+          <button class="ghost" type="button" onclick="clearAll()">Clear</button>
         </div>
 
         <div class="status-panel">
-          <p class="status-label">Status</p>
-          <p class="status-text" id="status">Waiting for images.</p>
+          <div class="status-label">Status</div>
+          <div class="status-text" id="status">Waiting for images.</div>
         </div>
       </aside>
 
-      <main class="panel results">
-        <div class="results-top">
-          <div class="workspace-head">
-            <h2>Results Gallery</h2>
-            <p>Each processed image returns an annotated preview and a prediction label.</p>
+      <main class="panel main">
+        <div class="main-top">
+          <div class="section-head">
+            <h2>Results</h2>
+            <p>Annotated previews and prediction labels appear here.</p>
           </div>
-          <div class="pill" id="summary">0 files queued</div>
+          <div class="queue-chip" id="summary">0 files queued</div>
         </div>
 
         <div class="results-scroll">
           <div class="empty" id="emptyState">
-            No images queued yet. Use the camera or upload controls to begin.
+            No images queued yet. Add a photo or upload files to begin.
           </div>
           <div class="gallery" id="gallery"></div>
         </div>
@@ -622,8 +606,8 @@
       card.innerHTML = `
         <img src="data:image/jpeg;base64,${imageBase64}" alt="Inference result for ${escapeHtml(fileName)}">
         <div class="card-body">
-          <p class="file-name">${escapeHtml(fileName)}</p>
-          <p class="result-label">${escapeHtml(label)}</p>
+          <div class="file-name">${escapeHtml(fileName)}</div>
+          <div class="result-label">${escapeHtml(label)}</div>
         </div>
       `;
       gallery.appendChild(card);
@@ -634,8 +618,8 @@
       card.className = "card";
       card.innerHTML = `
         <div class="card-body">
-          <p class="file-name">${escapeHtml(fileName)}</p>
-          <p class="result-label">Unable to process this image.</p>
+          <div class="file-name">${escapeHtml(fileName)}</div>
+          <div class="result-label">Unable to process this image.</div>
         </div>
       `;
       gallery.appendChild(card);
