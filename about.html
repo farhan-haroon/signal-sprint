@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>About | Analog Minds</title>
+  <style>
+    :root {
+      color-scheme: dark;
+      --surface: rgba(7, 11, 15, 0.36);
+      --surface-strong: rgba(8, 12, 16, 0.48);
+      --border: rgba(255, 255, 255, 0.16);
+      --border-soft: rgba(255, 255, 255, 0.11);
+      --text: #f3f5f7;
+      --muted: #a6afb9;
+      --accent-strong: #ffffff;
+      --shadow: 0 28px 80px rgba(0, 0, 0, 0.28);
+      --radius-xl: 28px;
+      --radius-lg: 22px;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html,
+    body {
+      margin: 0;
+      min-height: 100%;
+      background:
+        radial-gradient(circle at center, rgba(255, 255, 255, 0.04), rgba(5, 7, 9, 0.42) 72%),
+        linear-gradient(rgba(5, 7, 9, 0.22), rgba(5, 7, 9, 0.42)),
+        radial-gradient(circle at top, rgba(255, 255, 255, 0.14), transparent 34%),
+        url("diamond_jubilee.jpg") center center / cover no-repeat fixed;
+      color: var(--text);
+      font-family: "Times New Roman", Georgia, serif;
+    }
+
+    body {
+      min-height: 100dvh;
+    }
+
+    .page {
+      min-height: 100dvh;
+      display: grid;
+      grid-template-rows: auto auto 1fr;
+      gap: 18px;
+      padding: 18px;
+    }
+
+    .panel {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-xl);
+      box-shadow: var(--shadow);
+      backdrop-filter: blur(12px);
+    }
+
+    .topbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      padding: 14px 18px;
+    }
+
+    .brand {
+      color: var(--accent-strong);
+      text-decoration: none;
+      font-size: 1.05rem;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+    }
+
+    .nav {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+
+    .nav a {
+      padding: 10px 14px;
+      border-radius: 999px;
+      border: 1px solid var(--border-soft);
+      background: rgba(255, 255, 255, 0.08);
+      color: var(--text);
+      text-decoration: none;
+      font-size: 0.92rem;
+    }
+
+    .nav a.active {
+      background: rgba(255, 255, 255, 0.18);
+    }
+
+    .hero,
+    .content {
+      padding: 24px 26px;
+    }
+
+    .hero {
+      text-align: center;
+    }
+
+    .eyebrow {
+      margin: 0 0 10px;
+      color: var(--muted);
+      font-size: 0.74rem;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      font-weight: 700;
+    }
+
+    h1,
+    h2,
+    p {
+      margin: 0;
+    }
+
+    h1 {
+      font-size: clamp(2rem, 5vw, 4rem);
+      line-height: 0.96;
+      letter-spacing: -0.04em;
+    }
+
+    .hero p:last-child {
+      margin-top: 14px;
+      color: var(--muted);
+      line-height: 1.7;
+      font-size: 1rem;
+    }
+
+    .content {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 18px;
+      align-content: start;
+    }
+
+    .card {
+      padding: 20px;
+      border-radius: var(--radius-lg);
+      border: 1px solid var(--border-soft);
+      background: rgba(8, 12, 16, 0.2);
+    }
+
+    .card h2 {
+      margin-bottom: 10px;
+      font-size: 1.3rem;
+    }
+
+    .card p {
+      color: var(--muted);
+      line-height: 1.7;
+      font-size: 0.98rem;
+    }
+
+    @media (max-width: 900px) {
+      .topbar {
+        flex-direction: column;
+        align-items: stretch;
+      }
+
+      .brand {
+        text-align: center;
+      }
+
+      .nav {
+        justify-content: center;
+      }
+
+      .content {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="page">
+    <nav class="panel topbar">
+      <a class="brand" href="index.html">Analog Minds</a>
+      <div class="nav">
+        <a href="index.html">Home</a>
+        <a class="active" href="about.html">About</a>
+        <a href="help.html">Help</a>
+      </div>
+    </nav>
+
+    <header class="panel hero">
+      <p class="eyebrow">About This Project</p>
+      <h1>Campus cleanliness analysis for faster review.</h1>
+      <p>This interface lets users capture or upload images, preview them, and run inference to support waste and cleanliness inspection workflows.</p>
+    </header>
+
+    <main class="panel content">
+      <section class="card">
+        <h2>Purpose</h2>
+        <p>The project is designed to help review campus waste conditions through an image-based interface that highlights detected trash and returns an annotated result.</p>
+      </section>
+      <section class="card">
+        <h2>How It Works</h2>
+        <p>Users submit an image, the model processes it through the inference API, and the result card is updated with an annotated preview plus the final prediction label.</p>
+      </section>
+      <section class="card">
+        <h2>Team</h2>
+        <p>Analog Minds by Farhan Haroon and Shambhavi Pandey, with the Perception and Intelligence Lab, EE, IIT Kanpur context reflected in the current interface.</p>
+      </section>
+      <section class="card">
+        <h2>Deployment Shape</h2>
+        <p>The frontend is a static GitHub Pages-style interface, while inference is handled separately through the connected prediction API.</p>
+      </section>
+    </main>
+  </div>
+</body>
+</html>

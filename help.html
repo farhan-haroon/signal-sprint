@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Help | Analog Minds</title>
+  <style>
+    :root {
+      color-scheme: dark;
+      --surface: rgba(7, 11, 15, 0.36);
+      --surface-strong: rgba(8, 12, 16, 0.48);
+      --border: rgba(255, 255, 255, 0.16);
+      --border-soft: rgba(255, 255, 255, 0.11);
+      --text: #f3f5f7;
+      --muted: #a6afb9;
+      --accent-strong: #ffffff;
+      --shadow: 0 28px 80px rgba(0, 0, 0, 0.28);
+      --radius-xl: 28px;
+      --radius-lg: 22px;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html,
+    body {
+      margin: 0;
+      min-height: 100%;
+      background:
+        radial-gradient(circle at center, rgba(255, 255, 255, 0.04), rgba(5, 7, 9, 0.42) 72%),
+        linear-gradient(rgba(5, 7, 9, 0.22), rgba(5, 7, 9, 0.42)),
+        radial-gradient(circle at top, rgba(255, 255, 255, 0.14), transparent 34%),
+        url("diamond_jubilee.jpg") center center / cover no-repeat fixed;
+      color: var(--text);
+      font-family: "Times New Roman", Georgia, serif;
+    }
+
+    body {
+      min-height: 100dvh;
+    }
+
+    .page {
+      min-height: 100dvh;
+      display: grid;
+      grid-template-rows: auto auto 1fr;
+      gap: 18px;
+      padding: 18px;
+    }
+
+    .panel {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-xl);
+      box-shadow: var(--shadow);
+      backdrop-filter: blur(12px);
+    }
+
+    .topbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      padding: 14px 18px;
+    }
+
+    .brand {
+      color: var(--accent-strong);
+      text-decoration: none;
+      font-size: 1.05rem;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+    }
+
+    .nav {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+
+    .nav a {
+      padding: 10px 14px;
+      border-radius: 999px;
+      border: 1px solid var(--border-soft);
+      background: rgba(255, 255, 255, 0.08);
+      color: var(--text);
+      text-decoration: none;
+      font-size: 0.92rem;
+    }
+
+    .nav a.active {
+      background: rgba(255, 255, 255, 0.18);
+    }
+
+    .hero,
+    .content {
+      padding: 24px 26px;
+    }
+
+    .hero {
+      text-align: center;
+    }
+
+    .eyebrow {
+      margin: 0 0 10px;
+      color: var(--muted);
+      font-size: 0.74rem;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      font-weight: 700;
+    }
+
+    h1,
+    h2,
+    p,
+    li {
+      margin: 0;
+    }
+
+    h1 {
+      font-size: clamp(2rem, 5vw, 4rem);
+      line-height: 0.96;
+      letter-spacing: -0.04em;
+    }
+
+    .hero p:last-child {
+      margin-top: 14px;
+      color: var(--muted);
+      line-height: 1.7;
+      font-size: 1rem;
+    }
+
+    .content {
+      display: grid;
+      gap: 18px;
+    }
+
+    .card {
+      padding: 20px;
+      border-radius: var(--radius-lg);
+      border: 1px solid var(--border-soft);
+      background: rgba(8, 12, 16, 0.2);
+    }
+
+    .card h2 {
+      margin-bottom: 12px;
+      font-size: 1.3rem;
+    }
+
+    .card ol,
+    .card ul {
+      margin: 0;
+      padding-left: 20px;
+      color: var(--muted);
+      line-height: 1.8;
+      font-size: 0.98rem;
+    }
+
+    .card p {
+      color: var(--muted);
+      line-height: 1.7;
+      font-size: 0.98rem;
+    }
+
+    @media (max-width: 900px) {
+      .topbar {
+        flex-direction: column;
+        align-items: stretch;
+      }
+
+      .brand {
+        text-align: center;
+      }
+
+      .nav {
+        justify-content: center;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="page">
+    <nav class="panel topbar">
+      <a class="brand" href="index.html">Analog Minds</a>
+      <div class="nav">
+        <a href="index.html">Home</a>
+        <a href="about.html">About</a>
+        <a class="active" href="help.html">Help</a>
+      </div>
+    </nav>
+
+    <header class="panel hero">
+      <p class="eyebrow">Help</p>
+      <h1>How to use the interface.</h1>
+      <p>A quick reference for uploading, previewing, and running inference on images.</p>
+    </header>
+
+    <main class="panel content">
+      <section class="card">
+        <h2>Quick Steps</h2>
+        <ol>
+          <li>Use `Take a photo` or `Upload images` on the home page.</li>
+          <li>Confirm the preview cards appear in the results area.</li>
+          <li>Click `Run inference` to process the queued images.</li>
+          <li>Review the annotated outputs and prediction labels.</li>
+        </ol>
+      </section>
+      <section class="card">
+        <h2>Troubleshooting</h2>
+        <ul>
+          <li>If no preview appears, make sure the selected file is an image.</li>
+          <li>If inference fails, verify that the backend API endpoint is active.</li>
+          <li>If camera capture does not open, try a supported mobile browser.</li>
+        </ul>
+      </section>
+      <section class="card">
+        <h2>Notes</h2>
+        <p>The interface is static, but inference depends on a live external API. If the model endpoint is unavailable, previews will still show while result processing will fail.</p>
+      </section>
+    </main>
+  </div>
+</body>
+</html>
