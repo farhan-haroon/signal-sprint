@@ -500,16 +500,15 @@
 
     .result-variants {
       display: grid;
-      grid-template-columns: repeat(2, minmax(0, 1fr));
       gap: 12px;
       padding: 12px;
     }
 
-    .result-variant {
-      border: 1px solid var(--border-soft);
-      background: rgba(255, 255, 255, 0.04);
-      display: grid;
-      align-content: start;
+    .variant-switcher {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
     }
 
     .variant-head {
@@ -528,6 +527,34 @@
       text-transform: uppercase;
     }
 
+    .variant-buttons {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .variant-button {
+      padding: 8px 12px;
+      border: 1px solid var(--border-soft);
+      border-radius: 8px;
+      background: rgba(255, 255, 255, 0.06);
+      color: var(--text);
+      font: inherit;
+      font-size: 0.84rem;
+      cursor: pointer;
+    }
+
+    .variant-button.is-active {
+      background: rgba(255, 255, 255, 0.2);
+      border-color: rgba(255, 255, 255, 0.22);
+    }
+
+    .result-stage {
+      border: 1px solid var(--border-soft);
+      background: rgba(255, 255, 255, 0.04);
+    }
+
     .result-shell {
       display: grid;
       grid-template-columns: minmax(0, 1fr) auto;
@@ -535,13 +562,8 @@
     }
 
     .remark-drawer {
-      display: grid;
-      grid-template-columns: auto 0fr;
+      display: flex;
       min-height: 100%;
-    }
-
-    .remark-drawer[open] {
-      grid-template-columns: auto minmax(160px, 200px);
     }
 
     .remark-tab {
@@ -567,14 +589,18 @@
 
     .remark-panel {
       width: 0;
+      max-width: 0;
       overflow: hidden;
       border-left: 1px solid var(--border-soft);
       background: rgba(8, 12, 16, 0.3);
       color: var(--muted);
+      padding: 14px 0;
+      transition: max-width 0.28s ease, padding 0.28s ease, width 0.28s ease;
     }
 
     .remark-drawer[open] .remark-panel {
-      width: 100%;
+      width: 200px;
+      max-width: 200px;
       padding: 14px;
     }
 
@@ -727,20 +753,13 @@
         grid-template-columns: 1fr;
       }
 
-      .result-variants {
-        grid-template-columns: 1fr;
-      }
-
       .result-shell {
         grid-template-columns: 1fr;
       }
 
-      .remark-drawer {
-        grid-template-columns: 1fr;
-      }
-
-      .remark-drawer[open] {
-        grid-template-columns: 1fr;
+      .variant-head {
+        flex-direction: column;
+        align-items: stretch;
       }
 
       .remark-tab {
@@ -754,6 +773,7 @@
       .remark-panel,
       .remark-drawer[open] .remark-panel {
         width: 100%;
+        max-width: 100%;
         border-left: none;
         border-top: 1px solid var(--border-soft);
       }
@@ -1038,34 +1058,35 @@
       card.className = "card";
       card.innerHTML = `
         <div class="result-variants">
-          <section class="result-variant">
-            <div class="variant-head">
-              <div class="variant-title">Original</div>
-              <a class="download-link" href="${originalSrc}" download="original-${escapeHtml(item.file.name)}">Download</a>
+          <div class="variant-head">
+            <div class="variant-switcher">
+              <div class="variant-title">Preview Type</div>
+              <div class="variant-buttons">
+                <button class="variant-button is-active" type="button" data-variant="original">Original</button>
+                <button class="variant-button" type="button" data-variant="analyzed">Analyzed</button>
+              </div>
             </div>
+            <a class="download-link result-download-link" href="${originalSrc}" download="original-${escapeHtml(item.file.name)}">Download</a>
+          </div>
+          <section class="result-stage">
             <div class="result-shell">
-              <img src="${originalSrc}" alt="Original upload for ${escapeHtml(item.file.name)}">
+              <img
+                src="${originalSrc}"
+                alt="Original upload for ${escapeHtml(item.file.name)}"
+                class="result-main-image"
+                data-current-variant="original"
+                data-original-src="${originalSrc}"
+                data-analyzed-src="${resultSrc}"
+                data-original-alt="Original upload for ${escapeHtml(item.file.name)}"
+                data-analyzed-alt="Inference result for ${escapeHtml(item.file.name)}"
+                data-original-download="original-${escapeHtml(item.file.name)}"
+                data-analyzed-download="analyzed-${escapeHtml(item.file.name)}"
+              >
               <details class="remark-drawer">
                 <summary class="remark-tab">Remark</summary>
                 <div class="remark-panel">
-                  <div class="remark-title">Original Image</div>
-                  <div class="remark-text">This is the uploaded image before inference.</div>
-                </div>
-              </details>
-            </div>
-          </section>
-          <section class="result-variant">
-            <div class="variant-head">
-              <div class="variant-title">Analyzed</div>
-              <a class="download-link" href="${resultSrc}" download="analyzed-${escapeHtml(item.file.name)}">Download</a>
-            </div>
-            <div class="result-shell">
-              <img src="${resultSrc}" alt="Inference result for ${escapeHtml(item.file.name)}">
-              <details class="remark-drawer">
-                <summary class="remark-tab">Remark</summary>
-                <div class="remark-panel">
-                  <div class="remark-title">Inference</div>
-                  <div class="remark-text">${escapeHtml(label)}</div>
+                  <div class="remark-title result-remark-title">Original Image</div>
+                  <div class="remark-text result-remark-text">This is the uploaded image before inference.</div>
                 </div>
               </details>
             </div>
@@ -1075,11 +1096,49 @@
           <div class="file-name">${escapeHtml(item.file.name)}</div>
         </div>
       `;
-      const images = card.querySelectorAll("img");
-      images.forEach((image) => {
-        const title = image.alt.includes("Original") ? "Original - " + item.file.name : "Analyzed - " + item.file.name;
-        image.addEventListener("click", () => openImageModal(image.src, title));
+      const image = card.querySelector(".result-main-image");
+      const downloadLink = card.querySelector(".result-download-link");
+      const remarkTitle = card.querySelector(".result-remark-title");
+      const remarkText = card.querySelector(".result-remark-text");
+      const buttons = card.querySelectorAll(".variant-button");
+
+      if (image) {
+        image.addEventListener("click", () => {
+          const title = image.dataset.currentVariant === "analyzed" ? "Analyzed - " + item.file.name : "Original - " + item.file.name;
+          openImageModal(image.src, title);
+        });
+      }
+
+      buttons.forEach((button) => {
+        button.addEventListener("click", () => {
+          const variant = button.dataset.variant;
+          buttons.forEach((entry) => entry.classList.toggle("is-active", entry === button));
+
+          if (!image || !downloadLink || !remarkTitle || !remarkText) {
+            return;
+          }
+
+          if (variant === "analyzed") {
+            image.src = image.dataset.analyzedSrc;
+            image.alt = image.dataset.analyzedAlt;
+            image.dataset.currentVariant = "analyzed";
+            downloadLink.href = image.dataset.analyzedSrc;
+            downloadLink.download = image.dataset.analyzedDownload;
+            remarkTitle.textContent = "Inference";
+            remarkText.textContent = label;
+            return;
+          }
+
+          image.src = image.dataset.originalSrc;
+          image.alt = image.dataset.originalAlt;
+          image.dataset.currentVariant = "original";
+          downloadLink.href = image.dataset.originalSrc;
+          downloadLink.download = image.dataset.originalDownload;
+          remarkTitle.textContent = "Original Image";
+          remarkText.textContent = "This is the uploaded image before inference.";
+        });
       });
+
       gallery.appendChild(card);
       toggleEmptyState();
     }
