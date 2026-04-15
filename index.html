@@ -35,7 +35,8 @@
     html, body {
       width: 100%;
       height: 100%;
-      overflow: hidden;
+      overflow-x: hidden;
+      overflow-y: auto;
     }
 
     body {
@@ -105,11 +106,12 @@
 
     /* ══ LAYOUT ══ */
     .layout {
-      position:relative; z-index:1;
-      flex:1;
-      display:flex;
-      min-height:0;
-      overflow:hidden;
+      position: relative;
+      z-index: 1;
+      flex: 1;
+      display: flex;
+      min-height: calc(100vh - var(--topbar-h)); /* ✅ full height */
+      width: 100%;
     }
 
     /* ══ SIDEBAR ══ */
@@ -307,11 +309,11 @@
 
     /* ══ MAIN ══ */
     .main {
-      flex:1;
-      display:flex;
-      flex-direction:column;
-      min-width:0;
-      overflow:hidden;
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      min-width: 0;
+      width: 100%;   /* ✅ critical */
     }
 
     .main-header {
@@ -354,14 +356,6 @@
       font-family:var(--mono); font-size:10px;
       letter-spacing:0.12em; color:var(--text-muted);
       text-transform:uppercase;
-    }
-
-    /* gallery */
-    .gallery {
-      display:grid;
-      grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); /* Reduce min column width */
-      gap:14px;
-      width: 100%;
     }
 
     /* image card */
@@ -494,13 +488,6 @@
         overflow-y: auto;
         overflow-x: hidden;
         padding: 16px 12px 32px;   /* reduce from 28px */
-      }
-
-      .gallery {
-        display: grid;
-        grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); /* was 160px */
-        gap: 18px;
-        width: 100%;
       }
 
       .main-header { padding:0 14px; }
