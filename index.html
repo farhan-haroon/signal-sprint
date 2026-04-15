@@ -1,161 +1,538 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-<meta charset="UTF-8">
-<title>Trash Detection</title>
-
-<style>
-body {
-  margin: 0;
-  font-family: Arial;
-  background: #111;
-  color: #eee;
-}
-
-.container {
-  display: flex;
-  height: 100vh;
-}
-
-/* sidebar */
-.sidebar {
-  width: 250px;
-  padding: 20px;
-  background: #1a1a1a;
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-}
-
-button {
-  padding: 10px;
-  border: none;
-  cursor: pointer;
-}
-
-.run { background: #c8f542; color: black; }
-.clear { background: #ff4444; color: white; }
-
-/* main */
-.main {
-  flex: 1;
-  padding: 20px;
-  overflow-y: auto;
-}
-
-.gallery {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
-  gap: 15px;
-}
-
-.card {
-  background: #222;
-  padding: 10px;
-}
-
-.card img {
-  width: 100%;
-}
-
-/* status */
-.status {
-  font-size: 12px;
-  color: #aaa;
-}
-</style>
-</head>
-
-<body>
-
-<div class="container">
-
-  <!-- Sidebar -->
-  <div class="sidebar">
-    <input type="file" id="files" multiple>
-    <input type="file" id="folder" webkitdirectory multiple>
-
-    <button class="run" onclick="run()">Run Inference</button>
-    <button class="clear" onclick="clearAll()">Clear</button>
-
-    <div class="status" id="status"></div>
-  </div>
-
-  <!-- Main -->
-  <div class="main">
-    <div class="gallery" id="gallery"></div>
-  </div>
-
-</div>
-
-<script>
-const API = "https://corsage-drainable-trimmer.ngrok-free.dev/predict";
-
-let files = [];
-
-document.getElementById('files').onchange = e => addFiles(e.target.files);
-document.getElementById('folder').onchange = e => addFiles(e.target.files);
-
-function addFiles(f) {
-  files = files.concat(Array.from(f));
-  setStatus(files.length + " files selected");
-}
-
-function setStatus(msg) {
-  document.getElementById('status').innerText = msg;
-}
-
-function clearAll() {
-  files = [];
-  document.getElementById('gallery').innerHTML = "";
-  setStatus("cleared");
-}
-
-async function run() {
-  if (!files.length) {
-    setStatus("no files");
-    return;
-  }
-
-  setStatus("processing...");
-  const gallery = document.getElementById('gallery');
-
-  for (let file of files) {
-    let fd = new FormData();
-    fd.append("file", file);
-
-    try {
-      let res = await fetch(API, { method: "POST", body: fd });
-      let data = await res.json();
-
-      let div = document.createElement("div");
-      div.className = "card";
-
-      div.innerHTML = `
-        <img src="data:image/jpeg;base64,${data.image}">
-        <p>${getLabel(data.bin_detected, data.prediction)}</p>
-      `;
-
-      gallery.appendChild(div);
-
-    } catch (e) {
-      let div = document.createElement("div");
-      div.className = "card";
-      div.innerHTML = `<p>Error: ${file.name}</p>`;
-      gallery.appendChild(div);
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Trash Detection</title>
+  <style>
+    :root {
+      color-scheme: dark;
+      --bg: #07131a;
+      --bg-accent: #0d232c;
+      --panel: rgba(9, 26, 33, 0.9);
+      --panel-strong: rgba(13, 36, 45, 0.96);
+      --border: rgba(168, 234, 214, 0.18);
+      --text: #effaf7;
+      --muted: #9ec5bb;
+      --primary: #b9ff4f;
+      --primary-strong: #d6ff7f;
+      --danger: #ff6b57;
+      --shadow: 0 24px 60px rgba(0, 0, 0, 0.32);
+      --radius-lg: 28px;
+      --radius-md: 18px;
+      --radius-sm: 12px;
     }
-  }
 
-  setStatus("done");
-  files = [];
-}
+    * {
+      box-sizing: border-box;
+    }
 
-function getLabel(bin, pred) {
-  if (!bin) return "No bin detected";
-  if (pred === 1.0) return "Trash detected (DMC required)";
-  return "Clean";
-}
-</script>
+    html,
+    body {
+      margin: 0;
+      min-height: 100%;
+      font-family: "Segoe UI", "Helvetica Neue", sans-serif;
+      background:
+        radial-gradient(circle at top left, rgba(185, 255, 79, 0.2), transparent 24%),
+        radial-gradient(circle at top right, rgba(67, 189, 255, 0.16), transparent 28%),
+        linear-gradient(160deg, var(--bg) 0%, #061018 42%, #03070b 100%);
+      color: var(--text);
+    }
 
+    body {
+      min-height: 100dvh;
+    }
+
+    .app-shell {
+      min-height: 100dvh;
+      display: grid;
+      grid-template-columns: minmax(280px, 340px) minmax(0, 1fr);
+      gap: 20px;
+      padding: 20px;
+    }
+
+    .panel {
+      backdrop-filter: blur(16px);
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      box-shadow: var(--shadow);
+    }
+
+    .sidebar {
+      display: flex;
+      flex-direction: column;
+      padding: 24px;
+      min-height: 0;
+    }
+
+    .eyebrow {
+      margin: 0 0 10px;
+      color: var(--primary);
+      font-size: 0.82rem;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+      font-weight: 700;
+    }
+
+    h1 {
+      margin: 0;
+      font-size: clamp(2rem, 4vw, 3.5rem);
+      line-height: 0.96;
+    }
+
+    .intro {
+      margin: 14px 0 0;
+      color: var(--muted);
+      line-height: 1.6;
+      max-width: 28ch;
+    }
+
+    .control-group {
+      display: grid;
+      gap: 14px;
+      margin-top: 28px;
+    }
+
+    .upload-card {
+      display: grid;
+      gap: 8px;
+      padding: 16px;
+      border-radius: var(--radius-md);
+      background: rgba(255, 255, 255, 0.03);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+    }
+
+    .upload-card span {
+      font-weight: 600;
+    }
+
+    .upload-card small {
+      color: var(--muted);
+      line-height: 1.4;
+    }
+
+    input[type="file"] {
+      width: 100%;
+      color: var(--muted);
+    }
+
+    input[type="file"]::file-selector-button {
+      margin-right: 12px;
+      border: none;
+      border-radius: 999px;
+      padding: 10px 14px;
+      background: rgba(255, 255, 255, 0.1);
+      color: var(--text);
+      cursor: pointer;
+    }
+
+    .actions {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 12px;
+      margin-top: 18px;
+    }
+
+    button {
+      min-height: 52px;
+      border: none;
+      border-radius: 999px;
+      font-size: 1rem;
+      font-weight: 700;
+      cursor: pointer;
+      transition: transform 0.18s ease, filter 0.18s ease, opacity 0.18s ease;
+    }
+
+    button:hover {
+      transform: translateY(-1px);
+      filter: brightness(1.05);
+    }
+
+    button:active {
+      transform: translateY(0);
+    }
+
+    .run {
+      background: linear-gradient(135deg, var(--primary) 0%, var(--primary-strong) 100%);
+      color: #102100;
+    }
+
+    .clear {
+      background: rgba(255, 107, 87, 0.15);
+      color: #ffd4ce;
+      border: 1px solid rgba(255, 107, 87, 0.3);
+    }
+
+    .status-panel {
+      margin-top: auto;
+      padding: 16px;
+      border-radius: var(--radius-md);
+      background: var(--panel-strong);
+      border: 1px solid rgba(255, 255, 255, 0.07);
+    }
+
+    .status-label {
+      display: block;
+      color: var(--muted);
+      font-size: 0.82rem;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      margin-bottom: 8px;
+    }
+
+    .status {
+      min-height: 1.4em;
+      font-size: 0.98rem;
+      line-height: 1.5;
+    }
+
+    .main {
+      display: flex;
+      flex-direction: column;
+      min-height: 0;
+      padding: 24px;
+      overflow: hidden;
+    }
+
+    .main-header {
+      display: flex;
+      align-items: end;
+      justify-content: space-between;
+      gap: 16px;
+      margin-bottom: 18px;
+    }
+
+    .main-header h2 {
+      margin: 0;
+      font-size: clamp(1.35rem, 2vw, 1.9rem);
+    }
+
+    .main-header p {
+      margin: 6px 0 0;
+      color: var(--muted);
+      line-height: 1.5;
+    }
+
+    .summary-pill {
+      white-space: nowrap;
+      padding: 10px 14px;
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      color: var(--muted);
+      font-size: 0.95rem;
+    }
+
+    .gallery-wrap {
+      flex: 1;
+      min-height: 0;
+      overflow-y: auto;
+      padding-right: 4px;
+    }
+
+    .empty-state {
+      height: 100%;
+      min-height: 280px;
+      display: grid;
+      place-items: center;
+      text-align: center;
+      padding: 28px;
+      border: 1px dashed rgba(255, 255, 255, 0.14);
+      border-radius: var(--radius-md);
+      color: var(--muted);
+      background: rgba(255, 255, 255, 0.02);
+    }
+
+    .gallery {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+      gap: 16px;
+    }
+
+    .card {
+      overflow: hidden;
+      border-radius: var(--radius-md);
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+    }
+
+    .card img {
+      display: block;
+      width: 100%;
+      aspect-ratio: 1 / 1;
+      object-fit: cover;
+      background: #091217;
+    }
+
+    .card-body {
+      padding: 14px;
+    }
+
+    .card-title {
+      margin: 0 0 8px;
+      font-size: 0.95rem;
+      word-break: break-word;
+    }
+
+    .card-result {
+      margin: 0;
+      color: var(--muted);
+      line-height: 1.45;
+    }
+
+    @media (max-width: 960px) {
+      .app-shell {
+        grid-template-columns: 1fr;
+      }
+
+      .sidebar,
+      .main {
+        min-height: auto;
+      }
+
+      .intro {
+        max-width: none;
+      }
+
+      .status-panel {
+        margin-top: 20px;
+      }
+    }
+
+    @media (max-width: 640px) {
+      .app-shell {
+        gap: 14px;
+        padding: 14px;
+      }
+
+      .sidebar,
+      .main {
+        padding: 18px;
+        border-radius: 22px;
+      }
+
+      .actions {
+        grid-template-columns: 1fr;
+      }
+
+      .main-header {
+        flex-direction: column;
+        align-items: stretch;
+      }
+
+      .summary-pill {
+        white-space: normal;
+      }
+
+      .gallery {
+        grid-template-columns: 1fr;
+      }
+
+      .empty-state {
+        min-height: 220px;
+        padding: 20px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="app-shell">
+    <aside class="panel sidebar">
+      <div>
+        <p class="eyebrow">Waste Analysis</p>
+        <h1>Trash Detection Dashboard</h1>
+        <p class="intro">
+          Upload one image or an entire folder, run inference, and review annotated results in a full-screen layout that scales across desktop and mobile.
+        </p>
+      </div>
+
+      <div class="control-group">
+        <label class="upload-card">
+          <span>Select image files</span>
+          <small>Pick one or more images from your device.</small>
+          <input type="file" id="files" multiple accept="image/*">
+        </label>
+
+        <label class="upload-card">
+          <span>Select a folder</span>
+          <small>Import a whole directory of images in one pass.</small>
+          <input type="file" id="folder" webkitdirectory multiple accept="image/*">
+        </label>
+      </div>
+
+      <div class="actions">
+        <button class="run" type="button" onclick="run()">Run Inference</button>
+        <button class="clear" type="button" onclick="clearAll()">Clear</button>
+      </div>
+
+      <div class="status-panel">
+        <span class="status-label">Status</span>
+        <div class="status" id="status">Choose files to begin.</div>
+      </div>
+    </aside>
+
+    <main class="panel main">
+      <div class="main-header">
+        <div>
+          <h2>Results</h2>
+          <p>Annotated predictions appear here after each upload is processed.</p>
+        </div>
+        <div class="summary-pill" id="summary">0 files selected</div>
+      </div>
+
+      <div class="gallery-wrap">
+        <div class="empty-state" id="emptyState">
+          Upload files and run inference to populate the results gallery.
+        </div>
+        <div class="gallery" id="gallery"></div>
+      </div>
+    </main>
+  </div>
+
+  <script>
+    const API = "https://corsage-drainable-trimmer.ngrok-free.dev/predict";
+
+    let files = [];
+
+    const fileInput = document.getElementById("files");
+    const folderInput = document.getElementById("folder");
+    const gallery = document.getElementById("gallery");
+    const status = document.getElementById("status");
+    const summary = document.getElementById("summary");
+    const emptyState = document.getElementById("emptyState");
+
+    fileInput.onchange = (event) => addFiles(event.target.files);
+    folderInput.onchange = (event) => addFiles(event.target.files);
+
+    function updateSummary() {
+      const count = files.length;
+      summary.textContent = count === 1 ? "1 file selected" : count + " files selected";
+    }
+
+    function setStatus(message) {
+      status.textContent = message;
+    }
+
+    function toggleEmptyState() {
+      emptyState.style.display = gallery.children.length ? "none" : "grid";
+    }
+
+    function addFiles(fileList) {
+      const incoming = Array.from(fileList).filter((file) => file.type.startsWith("image/"));
+      files = files.concat(incoming);
+      updateSummary();
+
+      if (!incoming.length) {
+        setStatus("No image files were added.");
+        return;
+      }
+
+      const added = incoming.length;
+      const total = files.length;
+      setStatus((added === 1 ? "1 image added. " : added + " images added. ") + total + " ready.");
+    }
+
+    function clearAll() {
+      files = [];
+      gallery.innerHTML = "";
+      fileInput.value = "";
+      folderInput.value = "";
+      updateSummary();
+      toggleEmptyState();
+      setStatus("Selections and results cleared.");
+    }
+
+    async function run() {
+      if (!files.length) {
+        setStatus("No files selected.");
+        return;
+      }
+
+      gallery.innerHTML = "";
+      toggleEmptyState();
+      setStatus("Processing " + files.length + " file(s)...");
+
+      const queue = [...files];
+
+      for (let index = 0; index < queue.length; index += 1) {
+        const file = queue[index];
+        const formData = new FormData();
+        formData.append("file", file);
+
+        setStatus("Processing " + (index + 1) + " of " + queue.length + ": " + file.name);
+
+        try {
+          const response = await fetch(API, { method: "POST", body: formData });
+
+          if (!response.ok) {
+            throw new Error("Request failed with status " + response.status);
+          }
+
+          const data = await response.json();
+          renderCard(file.name, data.image, getLabel(data.bin_detected, data.prediction));
+        } catch (error) {
+          renderErrorCard(file.name);
+        }
+
+        toggleEmptyState();
+      }
+
+      setStatus("Inference complete.");
+      files = [];
+      updateSummary();
+      fileInput.value = "";
+      folderInput.value = "";
+    }
+
+    function renderCard(fileName, imageBase64, label) {
+      const card = document.createElement("article");
+      card.className = "card";
+      card.innerHTML = `
+        <img src="data:image/jpeg;base64,${imageBase64}" alt="Inference result for ${escapeHtml(fileName)}">
+        <div class="card-body">
+          <p class="card-title">${escapeHtml(fileName)}</p>
+          <p class="card-result">${escapeHtml(label)}</p>
+        </div>
+      `;
+      gallery.appendChild(card);
+    }
+
+    function renderErrorCard(fileName) {
+      const card = document.createElement("article");
+      card.className = "card";
+      card.innerHTML = `
+        <div class="card-body">
+          <p class="card-title">${escapeHtml(fileName)}</p>
+          <p class="card-result">Unable to process this file.</p>
+        </div>
+      `;
+      gallery.appendChild(card);
+    }
+
+    function getLabel(binDetected, prediction) {
+      if (!binDetected) {
+        return "No bin detected";
+      }
+
+      if (prediction === 1.0) {
+        return "Trash detected (DMC required)";
+      }
+
+      return "Clean";
+    }
+
+    function escapeHtml(value) {
+      return String(value)
+        .replaceAll("&", "&amp;")
+        .replaceAll("<", "&lt;")
+        .replaceAll(">", "&gt;")
+        .replaceAll('"', "&quot;")
+        .replaceAll("'", "&#39;");
+    }
+
+    updateSummary();
+    toggleEmptyState();
+  </script>
 </body>
 </html>
