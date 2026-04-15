@@ -7,10 +7,10 @@
   <style>
     :root {
       color-scheme: dark;
-      --surface: rgba(7, 11, 15, 0.24);
-      --surface-strong: rgba(8, 12, 16, 0.34);
-      --border: rgba(255, 255, 255, 0.18);
-      --border-soft: rgba(255, 255, 255, 0.14);
+      --surface: rgba(7, 11, 15, 0.36);
+      --surface-strong: rgba(8, 12, 16, 0.48);
+      --border: rgba(255, 255, 255, 0.16);
+      --border-soft: rgba(255, 255, 255, 0.11);
       --text: #f3f5f7;
       --muted: #a6afb9;
       --accent-strong: #ffffff;
@@ -28,9 +28,9 @@
       margin: 0;
       min-height: 100%;
       background:
-        radial-gradient(circle at center, rgba(255, 255, 255, 0.08), rgba(5, 7, 9, 0.28) 72%),
-        linear-gradient(rgba(5, 7, 9, 0.12), rgba(5, 7, 9, 0.3)),
-        radial-gradient(circle at top, rgba(255, 255, 255, 0.18), transparent 36%),
+        radial-gradient(circle at center, rgba(255, 255, 255, 0.08), rgba(5, 7, 9, 0.32) 72%),
+        linear-gradient(rgba(5, 7, 9, 0.16), rgba(5, 7, 9, 0.34)),
+        radial-gradient(circle at top, rgba(255, 255, 255, 0.16), transparent 36%),
         url("diamond_jubilee.jpg") center center / cover no-repeat fixed;
       color: var(--text);
       font-family: "Times New Roman", Georgia, serif;
@@ -58,6 +58,7 @@
 
     .topbar {
       position: relative;
+      z-index: 20;
       display: flex;
       align-items: center;
       justify-content: space-between;
@@ -75,6 +76,7 @@
 
     .menu {
       position: relative;
+      z-index: 30;
     }
 
     .menu-toggle {
@@ -97,6 +99,7 @@
       position: absolute;
       top: calc(100% + 10px);
       right: 0;
+      z-index: 40;
       min-width: 170px;
       display: grid;
       gap: 8px;
@@ -169,7 +172,7 @@
       padding: 20px;
       border-radius: var(--radius-lg);
       border: 1px solid var(--border-soft);
-      background: rgba(8, 12, 16, 0.12);
+      background: rgba(8, 12, 16, 0.2);
     }
 
     .card h2 {
