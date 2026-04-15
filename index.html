@@ -21,10 +21,10 @@
       --success: #f2f2f2;
       --danger: #cfcfcf;
       --shadow: 0 28px 80px rgba(0, 0, 0, 0.28);
-      --radius-xl: 28px;
-      --radius-lg: 22px;
-      --radius-md: 16px;
-      --radius-sm: 12px;
+      --radius-xl: 12px;
+      --radius-lg: 10px;
+      --radius-md: 8px;
+      --radius-sm: 6px;
     }
 
     * {
@@ -41,7 +41,8 @@
         radial-gradient(circle at top, rgba(255, 255, 255, 0.16), transparent 36%),
         url("diamond_jubilee.jpg") center center / cover no-repeat fixed;
       color: var(--text);
-      font-family: "Palatino Linotype", "Book Antiqua", Georgia, serif;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+      transition: background 0.6s ease;
     }
 
     html.solid-bg, body.solid-bg {
@@ -77,7 +78,7 @@
       justify-content: space-between;
       gap: 16px;
       padding: 10px 14px;
-      background: rgba(7, 9, 11, 0.72);
+      background: rgba(7, 9, 11, 0.4);
       border: 1px solid var(--border);
       border-radius: var(--radius-xl);
       box-shadow: var(--shadow);
@@ -86,7 +87,7 @@
     }
 
     html.solid-bg .topbar {
-      background: rgba(5, 7, 9, 0.95);
+      background: rgba(5, 7, 9, 0.6);
       border-color: rgba(255, 255, 255, 0.1);
     }
 
@@ -1440,10 +1441,38 @@
     updateSummary();
     toggleEmptyState();
 
-    // Theme toggle functionality
+    // Theme toggle functionality with background image cycling
     const themeToggle = document.getElementById("themeToggle");
     const themeIconLight = themeToggle.querySelector(".theme-icon-light");
     const themeIconDark = themeToggle.querySelector(".theme-icon-dark");
+    
+    const backgroundImages = [
+      "diamond_jubilee.jpg",
+      "253157-featured-imagesmoin-26.jpg",
+      "IIT_Kanpur-Kanpur-Indian-Institute-of-Technology-by-Kanvinde-Rai-and-Chowdhury.jpg",
+      "map1-1.jpg",
+      "pk-lekler-lab.jpg"
+    ];
+    
+    let bgImageIndex = parseInt(localStorage.getItem("bgImageIndex") || "0");
+    
+    function updateBackgroundImage() {
+      const html = document.documentElement;
+      const body = document.body;
+      const isSolidBg = html.classList.contains("solid-bg");
+      
+      if (!isSolidBg) {
+        const imageSrc = backgroundImages[bgImageIndex];
+        const bgGradient = `
+          radial-gradient(circle at center, rgba(255, 255, 255, 0.08), rgba(5, 7, 9, 0.32) 72%),
+          linear-gradient(rgba(5, 7, 9, 0.16), rgba(5, 7, 9, 0.34)),
+          radial-gradient(circle at top, rgba(255, 255, 255, 0.16), transparent 36%),
+          url("${imageSrc}") center center / cover no-repeat fixed
+        `;
+        html.style.background = bgGradient;
+        body.style.background = bgGradient;
+      }
+    }
     
     function updateThemeIcons() {
       const html = document.documentElement;
@@ -1465,20 +1494,27 @@
       if (isSolidBg) {
         html.classList.remove("solid-bg");
         body.classList.remove("solid-bg");
+        bgImageIndex = (bgImageIndex + 1) % backgroundImages.length;
+        localStorage.setItem("bgImageIndex", bgImageIndex);
+        updateBackgroundImage();
         localStorage.setItem("bgMode", "translucent");
       } else {
         html.classList.add("solid-bg");
         body.classList.add("solid-bg");
+        html.style.background = "linear-gradient(rgba(5, 7, 9, 0.95), rgba(5, 7, 9, 0.95))";
+        body.style.background = "linear-gradient(rgba(5, 7, 9, 0.95), rgba(5, 7, 9, 0.95))";
         localStorage.setItem("bgMode", "solid");
       }
       updateThemeIcons();
     });
 
-    // Restore saved background mode on page load
+    // Restore saved background mode and image on page load
     const savedBgMode = localStorage.getItem("bgMode") || "translucent";
     if (savedBgMode === "solid") {
       document.documentElement.classList.add("solid-bg");
       document.body.classList.add("solid-bg");
+    } else {
+      updateBackgroundImage();
     }
     updateThemeIcons();
   </script>
