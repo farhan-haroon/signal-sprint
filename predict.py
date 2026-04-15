@@ -120,4 +120,4 @@ def predict(model, image_path, return_image=False):
                 result = 1.0
                 break
 
-    return result, annotated, True  # (prediction, annotated_image, bin_detected)
+    return result, annotated, len(bin_boxes)  # (prediction, annotated_image, bin_detected)

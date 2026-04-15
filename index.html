@@ -1345,10 +1345,10 @@
       }
 
       if (prediction === 1.0 || prediction === 1) {
-        return `${binDetected} no of dustbins found and trash is spilling. Immediate DMC action required.`;
+        return `${binDetected} dustbins found and trash is spilling. Immediate DMC action required.`;
       }
 
-      return `${binDetected} no of dustbins found but the area appears to be clean. DMC action is not required.`;
+      return `${binDetected} dustbins found but the area appears to be clean. DMC action is not required.`;
     }
 
     function getLabel(binDetected, prediction) {
