@@ -9,11 +9,11 @@
       color-scheme: dark;
       --bg: #050709;
       --bg-soft: #0a0e12;
-      --surface: rgba(7, 11, 15, 0.54);
-      --surface-strong: rgba(8, 12, 16, 0.68);
-      --surface-faint: rgba(255, 255, 255, 0.04);
-      --border: rgba(255, 255, 255, 0.12);
-      --border-soft: rgba(255, 255, 255, 0.08);
+      --surface: rgba(7, 11, 15, 0.36);
+      --surface-strong: rgba(8, 12, 16, 0.48);
+      --surface-faint: rgba(255, 255, 255, 0.06);
+      --border: rgba(255, 255, 255, 0.16);
+      --border-soft: rgba(255, 255, 255, 0.11);
       --text: #f3f5f7;
       --muted: #97a0ab;
       --accent: #d7dde5;
@@ -36,9 +36,9 @@
       margin: 0;
       min-height: 100%;
       background:
-        radial-gradient(circle at center, rgba(5, 7, 9, 0.22), rgba(5, 7, 9, 0.66) 70%),
-        linear-gradient(rgba(5, 7, 9, 0.38), rgba(5, 7, 9, 0.58)),
-        radial-gradient(circle at top, rgba(255, 255, 255, 0.08), transparent 32%),
+        radial-gradient(circle at center, rgba(255, 255, 255, 0.04), rgba(5, 7, 9, 0.42) 72%),
+        linear-gradient(rgba(5, 7, 9, 0.22), rgba(5, 7, 9, 0.42)),
+        radial-gradient(circle at top, rgba(255, 255, 255, 0.14), transparent 34%),
         url("diamond_jubilee.jpg") center center / cover no-repeat fixed;
       color: var(--text);
       font-family: "Times New Roman", Georgia, serif;
@@ -61,7 +61,7 @@
       border: 1px solid var(--border);
       border-radius: var(--radius-xl);
       box-shadow: var(--shadow);
-      backdrop-filter: blur(14px);
+      backdrop-filter: blur(12px);
     }
 
     .hero {
@@ -159,7 +159,7 @@
       padding: 16px;
       border-radius: var(--radius-lg);
       border: 1px solid var(--border-soft);
-      background: rgba(8, 12, 16, 0.32);
+      background: rgba(8, 12, 16, 0.2);
       display: grid;
       gap: 12px;
     }
@@ -176,7 +176,7 @@
       border-radius: 14px;
       display: grid;
       place-items: center;
-      background: rgba(255, 255, 255, 0.06);
+      background: rgba(255, 255, 255, 0.09);
       border: 1px solid var(--border-soft);
       color: var(--accent);
       flex: 0 0 auto;
@@ -222,7 +222,7 @@
       border: 1px solid var(--border);
       border-radius: 999px;
       padding: 10px 14px;
-      background: rgba(255, 255, 255, 0.08);
+      background: rgba(255, 255, 255, 0.12);
       color: var(--text);
       display: inline-flex;
       align-items: center;
@@ -267,7 +267,7 @@
     }
 
     .ghost {
-      background: rgba(255, 255, 255, 0.07);
+      background: rgba(255, 255, 255, 0.12);
       color: var(--text);
     }
 
@@ -322,7 +322,7 @@
       padding: 10px 14px;
       border-radius: 999px;
       border: 1px solid var(--border-soft);
-      background: rgba(255, 255, 255, 0.07);
+      background: rgba(255, 255, 255, 0.12);
       color: var(--muted);
       font-size: 0.9rem;
       white-space: nowrap;
@@ -339,7 +339,7 @@
       height: 100%;
       border-radius: var(--radius-lg);
       border: 1px dashed var(--border-soft);
-      background: rgba(8, 12, 16, 0.24);
+      background: rgba(8, 12, 16, 0.16);
       display: grid;
       place-items: center;
       padding: 28px;
@@ -358,7 +358,7 @@
       overflow: hidden;
       border-radius: var(--radius-lg);
       border: 1px solid var(--border-soft);
-      background: rgba(8, 12, 16, 0.34);
+      background: rgba(8, 12, 16, 0.22);
     }
 
     .card img {
