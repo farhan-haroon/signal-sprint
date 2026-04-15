@@ -54,9 +54,26 @@
       background-color: #000;
     }
 
-    html.image-only-bg .page,
-    body.image-only-bg .page {
+    html.image-only-bg .page {
+      grid-template-rows: auto;
+      gap: 0;
+      padding: 0;
+    }
+
+    html.image-only-bg .hero,
+    body.image-only-bg .hero {
       display: none;
+    }
+
+    html.image-only-bg .workspace,
+    body.image-only-bg .workspace {
+      display: none;
+    }
+
+    html.image-only-bg .topbar {
+      border-radius: 0;
+      margin: 0;
+      background: rgba(0, 0, 0, 0.3);
     }
 
     body {
