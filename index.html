@@ -689,12 +689,34 @@
       text-decoration: none;
       font-size: 0.84rem;
       padding: 0;
+      transition: background 0.2s ease;
+    }
+    .download-link:hover {
+      background: rgba(0, 0, 0, 0.7);
     }
     .download-link svg {
       width: 16px;
       height: 16px;
       stroke: currentColor;
       stroke-width: 2;
+    }
+    
+    #imageModalDownload {
+      position: relative;
+      bottom: auto;
+      left: auto;
+      width: 40px;
+      height: 40px;
+      background: rgba(255, 255, 255, 0.12);
+      border: 1px solid var(--border-soft);
+    }
+    #imageModalDownload:hover {
+      background: rgba(255, 255, 255, 0.18);
+      border-color: var(--border);
+    }
+    #imageModalDownload svg {
+      width: 18px;
+      height: 18px;
     }
 
     .image-modal {
@@ -746,7 +768,9 @@
     .image-modal-actions {
       display: flex;
       align-items: center;
-      gap: 10px;
+      gap: 8px;
+      flex-wrap: wrap;
+      justify-content: flex-end;
     }
 
     .image-modal img {
