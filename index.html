@@ -1,826 +1,161 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="description" content="Intelligent trash detection system for IITK campus using computer vision.">
-  <title>Analog Minds 2 — Trash Detection</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Syne:wght@300;400;600&display=swap" rel="stylesheet">
+<meta charset="UTF-8">
+<title>Trash Detection</title>
 
-  <style>
-    :root {
-      --bg:           #080808;
-      --surface:      #0e0e0e;
-      --surface2:     #141414;
-      --border:       #1c1c1c;
-      --border-hover: #2a2a2a;
-      --text-primary: #d0d0d0;
-      --text-dim:     #606060;
-      --text-muted:   #303030;
-      --accent:       #c8f542;
-      --accent-glow:  rgba(200,245,66,0.12);
-      --accent-faint: rgba(200,245,66,0.06);
-      --danger:       #ff4444;
-      --warning:      #f5a623;
-      --success:      #c8f542;
-      --mono: 'Space Mono', monospace;
-      --sans: 'Syne', sans-serif;
-      --topbar-h: 52px;
-      --sidebar-w: 240px;
-    }
+<style>
+body {
+  margin: 0;
+  font-family: Arial;
+  background: #111;
+  color: #eee;
+}
 
-    *, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
+.container {
+  display: flex;
+  height: 100vh;
+}
 
-    html, body {
-      width: 100%;
-      height: 100%;
-      overflow-x: hidden;
-      overflow-y: auto;
-    }
+/* sidebar */
+.sidebar {
+  width: 250px;
+  padding: 20px;
+  background: #1a1a1a;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
 
-    body {
-      font-family: var(--sans);
-      background: var(--bg);
-      color: var(--text-primary);
-      display: flex;
-      flex-direction: column;
-    }
+button {
+  padding: 10px;
+  border: none;
+  cursor: pointer;
+}
 
-    body::after {
-      content: '';
-      position: fixed;
-      inset: 0;
-      background-image: radial-gradient(circle, rgba(255,255,255,0.035) 1px, transparent 1px);
-      background-size: 32px 32px;
-      pointer-events: none;
-      z-index: 0;
-    }
+.run { background: #c8f542; color: black; }
+.clear { background: #ff4444; color: white; }
 
-    /* ══ TOP BAR ══ */
-    .topbar {
-      position: relative;
-      z-index: 10;
-      flex-shrink: 0;
-      height: var(--topbar-h);
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding: 0 24px;
-      border-bottom: 1px solid var(--border);
-      background: var(--surface);
-    }
+/* main */
+.main {
+  flex: 1;
+  padding: 20px;
+  overflow-y: auto;
+}
 
-    .brand { display:flex; align-items:center; gap:10px; }
+.gallery {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+  gap: 15px;
+}
 
-    .brand-dot {
-      width:7px; height:7px;
-      border-radius:50%;
-      background:var(--accent);
-      box-shadow:0 0 8px var(--accent);
-      animation:blink 3s ease infinite;
-    }
-    @keyframes blink { 0%,88%,100%{opacity:1} 94%{opacity:0} }
+.card {
+  background: #222;
+  padding: 10px;
+}
 
-    .brand-name {
-      font-family:var(--mono);
-      font-size:11px; font-weight:700;
-      letter-spacing:0.18em;
-      text-transform:uppercase;
-      color:var(--text-primary);
-    }
+.card img {
+  width: 100%;
+}
 
-    .topbar-meta { display:flex; align-items:center; gap:20px; }
-
-    .topbar-tag {
-      font-family:var(--mono);
-      font-size:9px;
-      color:var(--text-muted);
-      letter-spacing:0.12em;
-      text-transform:uppercase;
-    }
-    .topbar-tag+.topbar-tag {
-      padding-left:20px;
-      border-left:1px solid var(--border);
-    }
-
-    /* ══ LAYOUT ══ */
-    .layout {
-      position: relative;
-      z-index: 1;
-      flex: 1;
-      display: flex;
-      min-height: calc(100vh - var(--topbar-h)); /* ✅ full height */
-      width: 100%;
-    }
-
-    /* ══ SIDEBAR ══ */
-    .sidebar {
-      width:var(--sidebar-w);
-      flex-shrink:0;
-      display:flex;
-      flex-direction:column;
-      border-right:1px solid var(--border);
-      background:var(--surface);
-      overflow-y:auto; overflow-x:hidden;
-    }
-    .sidebar::-webkit-scrollbar { width:3px; }
-    .sidebar::-webkit-scrollbar-track { background:transparent; }
-    .sidebar::-webkit-scrollbar-thumb { background:var(--border-hover); border-radius:2px; }
-
-    .sidebar-body {
-      flex:1;
-      display:flex;
-      flex-direction:column;
-      gap:18px;
-      padding:24px 20px;
-    }
-
-    .sidebar-footer {
-      padding:16px 20px;
-      border-top:1px solid var(--border);
-    }
-
-    .sec-label {
-      font-family:var(--mono);
-      font-size:9px; letter-spacing:0.22em;
-      text-transform:uppercase;
-      color:var(--text-muted);
-    }
-
-    /* drop zone */
-    .dropzone {
-      position:relative;
-      border:1px solid var(--border);
-      border-radius:3px;
-      padding:28px 16px;
-      display:flex;
-      flex-direction:column;
-      align-items:center;
-      gap:10px;
-      cursor:pointer;
-      background:var(--bg);
-      transition:border-color 0.2s, background 0.2s;
-      overflow:hidden;
-    }
-    .dropzone::before {
-      content:'';
-      position:absolute; inset:0;
-      background:var(--accent-faint);
-      opacity:0; transition:opacity 0.2s;
-    }
-    .dropzone:hover::before,
-    .dropzone.over::before { opacity:1; }
-    .dropzone:hover,
-    .dropzone.over         { border-color:var(--accent); }
-
-    .dropzone input {
-      position:absolute; inset:0;
-      opacity:0; cursor:pointer; z-index:2;
-      width:100%; height:100%;
-    }
-
-    .dz-icon {
-      width:28px; height:28px;
-      color:var(--text-muted);
-      position:relative; z-index:1;
-      transition:color 0.2s;
-    }
-    .dropzone:hover .dz-icon,
-    .dropzone.over .dz-icon { color:var(--accent); }
-
-    .dz-text {
-      font-size:12px; color:var(--text-dim);
-      text-align:center; line-height:1.5;
-      position:relative; z-index:1;
-    }
-    .dz-text em { font-style:normal; color:var(--accent); }
-
-    .dz-hint {
-      font-family:var(--mono);
-      font-size:9px; color:var(--text-muted);
-      position:relative; z-index:1; letter-spacing:0.08em;
-    }
-
-    /* file badge */
-    .file-badge {
-      display:none;
-      align-items:center; gap:8px;
-      padding:7px 10px;
-      border:1px solid rgba(200,245,66,0.2);
-      border-radius:3px;
-      background:var(--accent-faint);
-      font-family:var(--mono); font-size:10px;
-      color:var(--accent);
-    }
-    .file-badge.show { display:flex; }
-    .fb-dot { width:5px; height:5px; border-radius:50%; background:var(--accent); flex-shrink:0; }
-
-    /* btn row */
-    .btn-row { display:flex; gap:8px; }
-
-    .btn {
-      flex:1;
-      padding:9px 10px;
-      border:1px solid var(--border);
-      border-radius:3px;
-      background:var(--surface2);
-      color:var(--text-dim);
-      font-family:var(--mono); font-size:10px;
-      letter-spacing:0.04em;
-      cursor:pointer;
-      transition:all 0.18s;
-      display:flex; align-items:center;
-      justify-content:center; gap:6px;
-      white-space:nowrap;
-    }
-    .btn svg { width:11px; height:11px; flex-shrink:0; }
-    .btn:hover:not(:disabled) { border-color:var(--border-hover); color:var(--text-primary); }
-    .btn:disabled { opacity:0.3; cursor:not-allowed; }
-
-    /* run btn */
-    .btn-run {
-      width:100%; padding:13px;
-      border:1px solid rgba(200,245,66,0.3);
-      border-radius:3px;
-      background:var(--accent-faint);
-      color:var(--accent);
-      font-family:var(--mono); font-size:11px;
-      letter-spacing:0.1em; text-transform:uppercase;
-      cursor:pointer;
-      display:flex; align-items:center;
-      justify-content:center; gap:9px;
-      transition:all 0.18s;
-    }
-    .btn-run:hover:not(:disabled) {
-      background:var(--accent-glow);
-      border-color:rgba(200,245,66,0.55);
-      box-shadow:0 0 24px rgba(200,245,66,0.1);
-    }
-    .btn-run:disabled { opacity:0.35; cursor:not-allowed; }
-    .btn-run svg { width:13px; height:13px; }
-
-    /* clear btn */
-    .btn-clear {
-      width:100%; padding:10px;
-      border:1px solid rgba(255,68,68,0.18);
-      border-radius:3px;
-      background:transparent;
-      color:rgba(255,68,68,0.55);
-      font-family:var(--mono); font-size:10px;
-      letter-spacing:0.08em; text-transform:uppercase;
-      cursor:pointer;
-      display:flex; align-items:center;
-      justify-content:center; gap:7px;
-      transition:all 0.18s;
-    }
-    .btn-clear:hover { border-color:rgba(255,68,68,0.45); color:var(--danger); background:rgba(255,68,68,0.04); }
-    .btn-clear svg { width:11px; height:11px; }
-
-    /* status */
-    .status {
-      font-family:var(--mono); font-size:10px;
-      color:var(--text-muted);
-      display:flex; align-items:center; gap:7px;
-      min-height:16px;
-    }
-    .status.on { color:var(--accent); }
-    .spinner {
-      width:9px; height:9px;
-      border:1.5px solid rgba(200,245,66,0.2);
-      border-top-color:var(--accent);
-      border-radius:50%;
-      animation:spin 0.7s linear infinite;
-      flex-shrink:0;
-    }
-    @keyframes spin { to { transform:rotate(360deg) } }
-
-    /* info table */
-    .info-table { width:100%; }
-    .info-row {
-      display:flex; justify-content:space-between;
-      padding:5px 0;
-      border-bottom:1px solid var(--border);
-      font-family:var(--mono); font-size:9px;
-    }
-    .info-row:last-child { border-bottom:none; }
-    .info-key { color:var(--text-muted); }
-    .info-val { color:var(--text-dim); }
-
-    /* ══ MAIN ══ */
-    .main {
-      flex: 1;
-      display: flex;
-      flex-direction: column;
-      min-width: 0;
-      width: 100%;   /* ✅ critical */
-    }
-
-    .main-header {
-      flex-shrink:0;
-      display:flex;
-      align-items:center; justify-content:space-between;
-      padding:0 28px;
-      height:44px;
-      border-bottom:1px solid var(--border);
-      background:var(--surface);
-    }
-    .main-header-label {
-      font-family:var(--mono); font-size:9px;
-      letter-spacing:0.2em; text-transform:uppercase;
-      color:var(--text-muted);
-    }
-    .main-header-count {
-      font-family:var(--mono); font-size:9px;
-      color:var(--accent);
-    }
-
-    .results-area {
-      flex:1;
-      overflow-y:auto; overflow-x:hidden;
-      padding:24px 28px 40px;
-    }
-    .results-area::-webkit-scrollbar { width:4px; }
-    .results-area::-webkit-scrollbar-track { background:transparent; }
-    .results-area::-webkit-scrollbar-thumb { background:var(--border-hover); border-radius:2px; }
-
-    /* empty */
-    .empty {
-      width:100%; height:100%;
-      display:flex; flex-direction:column;
-      align-items:center; justify-content:center;
-      gap:14px; opacity:0.3;
-    }
-    .empty svg { width:44px; height:44px; color:var(--text-muted); }
-    .empty p {
-      font-family:var(--mono); font-size:10px;
-      letter-spacing:0.12em; color:var(--text-muted);
-      text-transform:uppercase;
-    }
-
-    /* image card */
-    .img-card {
-      border:1px solid var(--border);
-      border-radius:4px;
-      overflow:hidden;
-      background:var(--surface);
-      transition:border-color 0.2s;
-      animation:cardIn 0.35s ease both;
-    }
-    .img-card:hover { border-color:var(--border-hover); }
-    @keyframes cardIn { from{opacity:0;transform:translateY(10px)} to{opacity:1;transform:translateY(0)} }
-
-    .card-thumb {
-      position:relative;
-      aspect-ratio:1;
-      background:var(--bg);
-      overflow:hidden;
-    }
-    .card-thumb img { width:100%; height:100%; object-fit:cover; display:block; }
-    .card-fname {
-      position:absolute; bottom:0; left:0; right:0;
-      padding:5px 8px;
-      background:linear-gradient(transparent,rgba(0,0,0,0.8));
-      font-family:var(--mono); font-size:8px;
-      color:rgba(255,255,255,0.4);
-      white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
-    }
-
-    .card-result {
-      padding:10px 12px;
-      display:flex; align-items:center; gap:9px;
-    }
-    .c-dot { width:6px; height:6px; border-radius:50%; flex-shrink:0; }
-    .c-dot.ok    { background:var(--success); box-shadow:0 0 5px var(--success); }
-    .c-dot.alert { background:var(--danger);  box-shadow:0 0 5px var(--danger); }
-    .c-dot.warn  { background:var(--warning); box-shadow:0 0 5px var(--warning); }
-
-    .c-info { display:flex; flex-direction:column; gap:2px; overflow:hidden; }
-    .c-label { font-family:var(--mono); font-size:10px; font-weight:700; white-space:nowrap; }
-    .c-label.ok    { color:var(--success); }
-    .c-label.alert { color:var(--danger); }
-    .c-label.warn  { color:var(--warning); }
-    .c-sub { font-size:9px; color:var(--text-muted); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
-
-    /* error card */
-    .err-card {
-      border:1px solid rgba(255,68,68,0.12);
-      border-radius:4px;
-      padding:12px;
-      background:rgba(255,68,66,0.04);
-      display:flex; align-items:center; gap:9px;
-      font-family:var(--mono); font-size:10px;
-      color:var(--danger);
-      animation:cardIn 0.35s ease both;
-    }
-
-    /* ══ MOBILE FAB ══ */
-    .mobile-fab {
-      display:none;
-      position:fixed; bottom:20px; right:20px;
-      z-index:50;
-      width:52px; height:52px;
-      border-radius:50%;
-      background:var(--accent);
-      border:none; cursor:pointer;
-      align-items:center; justify-content:center;
-      box-shadow:0 4px 20px rgba(200,245,66,0.3);
-      transition:transform 0.15s, box-shadow 0.15s;
-    }
-    .mobile-fab:hover { transform:scale(1.06); box-shadow:0 6px 28px rgba(200,245,66,0.4); }
-    .mobile-fab svg { width:22px; height:22px; color:#000; }
-
-    /* bottom sheet */
-    .sheet-overlay {
-      display:none;
-      position:fixed; inset:0;
-      background:rgba(0,0,0,0.7);
-      z-index:60;
-      backdrop-filter:blur(4px);
-    }
-    .sheet-overlay.open { display:block; animation:fadeIn 0.2s ease; }
-    @keyframes fadeIn { from{opacity:0} to{opacity:1} }
-
-    .sheet {
-      position:fixed;
-      bottom:0; left:0; right:0;
-      z-index:61;
-      background:var(--surface);
-      border-top:1px solid var(--border);
-      border-radius:16px 16px 0 0;
-      padding:20px 20px 36px;
-      display:flex; flex-direction:column; gap:16px;
-      transform:translateY(100%);
-      transition:transform 0.3s cubic-bezier(0.4,0,0.2,1);
-    }
-    .sheet.open { transform:translateY(0); }
-
-    .sheet-handle {
-      width:36px; height:4px;
-      border-radius:2px;
-      background:var(--border-hover);
-      margin:0 auto 4px;
-    }
-    .sheet-title {
-      font-family:var(--mono); font-size:10px;
-      color:var(--text-muted); letter-spacing:0.18em;
-      text-transform:uppercase;
-    }
-
-    /* ══ RESPONSIVE ══ */
-    @media (max-width: 900px) { :root { --sidebar-w: 260px; } }
-
-    @media (max-width: 640px) {
-      html, body { overflow: hidden; height: 100vh; }
-
-      .layout { flex-direction:column; overflow:hidden; min-height:0; }
-      .sidebar { display:none; }
-
-      .main {
-        flex: 1;
-        display: flex;
-        flex-direction: column;
-        min-width: 0;
-        width: 100%;
-      }
-      .results-area {
-        flex: 1;
-        overflow-y: auto;
-        overflow-x: hidden;
-        padding: 16px 12px 32px;   /* reduce from 28px */
-      }
-
-      .main-header { padding:0 14px; }
-      .topbar { padding:0 16px; }
-      .topbar-meta .topbar-tag:last-child { display:none; }
-
-      .mobile-fab { display:flex; }
-    }
-
-    @media (max-width: 380px) {
-      .gallery { grid-template-columns:1fr 1fr; }
-    }
-
-    /* resizable sidebar */
-    .sidebar {
-      width: var(--sidebar-w);
-      resize: horizontal;
-      overflow: auto;
-      min-width: 180px;
-      max-width: 400px;
-    }
-    /* full stretch */
-    .layout {
-    width: 100vw;
-    height: calc(100vh - var(--topbar-h));
-    }
-    /* better grid */
-    .gallery {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
-    gap: 18px;
-    width: 100%;
-    }
-    /* modal */
-    .modal {
-    position: fixed;
-    inset: 0;
-    background: rgba(0,0,0,0.9);
-    display: none;
-    align-items: center;
-    justify-content: center;
-    z-index: 999;
-    }
-    .modal img {
-    max-width: 90%;
-    max-height: 90%;
-    border: 1px solid #333;
-    }
-    .modal.open {
-    display: flex;
-    animation: fadeIn 0.2s ease;
-    }
-    /* drag handle */
-    .resize-handle {
-    width: 4px;
-    cursor: ew-resize;
-    background: var(--border);
-  }
-  </style>
+/* status */
+.status {
+  font-size: 12px;
+  color: #aaa;
+}
+</style>
 </head>
+
 <body>
 
-<!-- TOP BAR -->
-<header class="topbar">
-  <div class="brand">
-    <div class="brand-dot"></div>
-    <span class="brand-name">Analog Minds 2</span>
-  </div>
-  <div class="topbar-meta">
-    <span class="topbar-tag">IITK Campus</span>
-    <span class="topbar-tag">Trash Detection · v1.0</span>
-  </div>
-</header>
+<div class="container">
 
-<div class="layout">
+  <!-- Sidebar -->
+  <div class="sidebar">
+    <input type="file" id="files" multiple>
+    <input type="file" id="folder" webkitdirectory multiple>
 
-  <!-- ══ SIDEBAR ══ -->
-  <aside class="sidebar">
-    <div class="sidebar-body">
+    <button class="run" onclick="run()">Run Inference</button>
+    <button class="clear" onclick="clearAll()">Clear</button>
 
-      <p class="sec-label">// input</p>
-
-      <div class="dropzone" id="dropzone">
-        <input type="file" id="fileInput" accept="image/*" multiple>
-        <input type="file" id="folderInput" webkitdirectory directory multiple style="display:none">
-        <svg class="dz-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
-          <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
-          <polyline points="17 8 12 3 7 8"/>
-          <line x1="12" y1="3" x2="12" y2="15"/>
-        </svg>
-        <p class="dz-text">Drop images here or <em>click to browse</em></p>
-        <p class="dz-hint">JPG · PNG · WEBP · supports batch</p>
-      </div>
-
-      <div class="file-badge" id="fileBadge">
-        <div class="fb-dot"></div>
-        <span id="fileCount">0 images staged</span>
-      </div>
-
-      <div class="btn-row">
-        <button class="btn" onclick="document.getElementById('fileInput').click()">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>
-          Add Files
-        </button>
-        <button class="btn" onclick="document.getElementById('folderInput').click()">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/><line x1="12" y1="11" x2="12" y2="17"/><line x1="9" y1="14" x2="15" y2="14"/></svg>
-          Add Folder
-        </button>
-      </div>
-
-      <button class="btn-run" id="runBtn" onclick="runInference()">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
-        Run Inference
-      </button>
-
-      <button class="btn-clear" onclick="clearAll()">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/></svg>
-        Clear All
-      </button>
-
-      <div class="status" id="statusEl"></div>
-
-    </div>
-
-    <div class="sidebar-footer">
-      <div class="info-table">
-        <div class="info-row"><span class="info-key">Model</span><span class="info-val">YOLOv8 Det+Seg</span></div>
-        <div class="info-row"><span class="info-key">Resolution</span><span class="info-val">512 × 512</span></div>
-        <div class="info-row"><span class="info-key">Det conf</span><span class="info-val">0.45</span></div>
-        <div class="info-row"><span class="info-key">Seg conf</span><span class="info-val">0.25</span></div>
-        <div class="info-row"><span class="info-key">Scope</span><span class="info-val">IITK Campus</span></div>
-      </div>
-    </div>
-  </aside>
-
-  <!-- ══ MAIN ══ -->
-  <main class="main">
-    <div class="main-header">
-      <span class="main-header-label">// Detection Results</span>
-      <span class="main-header-count" id="countLabel"></span>
-    </div>
-
-    <div class="results-area" id="resultsArea">
-      <div class="empty" id="emptyState">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1" stroke-linecap="round" stroke-linejoin="round">
-          <rect x="3" y="3" width="18" height="18" rx="2"/>
-          <circle cx="8.5" cy="8.5" r="1.5"/>
-          <polyline points="21 15 16 10 5 21"/>
-        </svg>
-        <p>awaiting input</p>
-      </div>
-      <div class="gallery" id="gallery" style="display:none"></div>
-    </div>
-  </main>
-</div>
-
-<!-- ══ MOBILE FAB ══ -->
-<button class="mobile-fab" id="fab" onclick="openSheet()">
-  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
-    <polyline points="17 8 12 3 7 8"/>
-    <line x1="12" y1="3" x2="12" y2="15"/>
-  </svg>
-</button>
-
-<div class="sheet-overlay" id="overlay" onclick="closeSheet()"></div>
-
-<div class="sheet" id="sheet">
-  <div class="sheet-handle"></div>
-  <p class="sheet-title">// Input</p>
-
-  <div class="dropzone" id="dropzoneMob">
-    <input type="file" id="fileInputMob" accept="image/*" multiple>
-    <svg class="dz-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
-      <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
-      <polyline points="17 8 12 3 7 8"/>
-      <line x1="12" y1="3" x2="12" y2="15"/>
-    </svg>
-    <p class="dz-text">Tap to select images</p>
-    <p class="dz-hint">supports multiple files</p>
+    <div class="status" id="status"></div>
   </div>
 
-  <div class="file-badge" id="fileBadgeMob">
-    <div class="fb-dot"></div>
-    <span id="fileCountMob">0 images staged</span>
+  <!-- Main -->
+  <div class="main">
+    <div class="gallery" id="gallery"></div>
   </div>
 
-  <button class="btn-run" id="runBtnMob" onclick="runInference(); closeSheet();">
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
-    Run Inference
-  </button>
-
-  <button class="btn-clear" onclick="clearAll(); closeSheet();">
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/></svg>
-    Clear All
-  </button>
-
-  <div class="status" id="statusMob"></div>
 </div>
 
 <script>
-  const API = "https://corsage-drainable-trimmer.ngrok-free.dev/predict";
-  let staged = [];
+const API = "https://corsage-drainable-trimmer.ngrok-free.dev/predict";
 
-  const fileInput    = document.getElementById('fileInput');
-  const fileInputMob = document.getElementById('fileInputMob');
-  const folderInput  = document.getElementById('folderInput');
-  const dropzone     = document.getElementById('dropzone');
-  const fileBadge    = document.getElementById('fileBadge');
-  const fileBadgeMob = document.getElementById('fileBadgeMob');
-  const fileCount    = document.getElementById('fileCount');
-  const fileCountMob = document.getElementById('fileCountMob');
-  const runBtn       = document.getElementById('runBtn');
-  const runBtnMob    = document.getElementById('runBtnMob');
-  const statusEl     = document.getElementById('statusEl');
-  const statusMob    = document.getElementById('statusMob');
-  const gallery      = document.getElementById('gallery');
-  const emptyState   = document.getElementById('emptyState');
-  const countLabel   = document.getElementById('countLabel');
+let files = [];
 
-  /* file inputs */
-  fileInput.addEventListener('change',    e => { addFiles(e.target.files); e.target.value=''; });
-  fileInputMob.addEventListener('change', e => { addFiles(e.target.files); e.target.value=''; });
-  folderInput.addEventListener('change',  e => { addFiles(e.target.files); e.target.value=''; });
+document.getElementById('files').onchange = e => addFiles(e.target.files);
+document.getElementById('folder').onchange = e => addFiles(e.target.files);
 
-  function addFiles(list) {
-    staged = staged.concat(Array.from(list).filter(f => f.type.startsWith('image/')));
-    refreshBadge();
+function addFiles(f) {
+  files = files.concat(Array.from(f));
+  setStatus(files.length + " files selected");
+}
+
+function setStatus(msg) {
+  document.getElementById('status').innerText = msg;
+}
+
+function clearAll() {
+  files = [];
+  document.getElementById('gallery').innerHTML = "";
+  setStatus("cleared");
+}
+
+async function run() {
+  if (!files.length) {
+    setStatus("no files");
+    return;
   }
 
-  function refreshBadge() {
-    const n = staged.length;
-    const txt = n > 0 ? `${n} image${n!==1?'s':''} staged` : '';
-    fileBadge.classList.toggle('show', n>0);
-    fileBadgeMob.classList.toggle('show', n>0);
-    fileCount.textContent = txt;
-    fileCountMob.textContent = txt;
-  }
+  setStatus("processing...");
+  const gallery = document.getElementById('gallery');
 
-  /* drag & drop */
-  dropzone.addEventListener('dragover', e => { e.preventDefault(); dropzone.classList.add('over'); });
-  dropzone.addEventListener('dragleave', () => dropzone.classList.remove('over'));
-  dropzone.addEventListener('drop', e => {
-    e.preventDefault(); dropzone.classList.remove('over');
-    addFiles(e.dataTransfer.files);
-  });
+  for (let file of files) {
+    let fd = new FormData();
+    fd.append("file", file);
 
-  /* bottom sheet */
-  function openSheet()  { document.getElementById('overlay').classList.add('open'); document.getElementById('sheet').classList.add('open'); }
-  function closeSheet() { document.getElementById('overlay').classList.remove('open'); document.getElementById('sheet').classList.remove('open'); }
+    try {
+      let res = await fetch(API, { method: "POST", body: fd });
+      let data = await res.json();
 
-  /* clear */
-  function clearAll() {
-    staged = [];
-    gallery.innerHTML = '';
-    gallery.style.display = 'none';
-    emptyState.style.display = 'flex';
-    countLabel.textContent = '';
-    setStatus('');
-    refreshBadge();
-  }
+      let div = document.createElement("div");
+      div.className = "card";
 
-  /* status */
-  function setStatus(msg, loading=false) {
-    [statusEl, statusMob].forEach(el => {
-      if (!msg) { el.innerHTML=''; el.className='status'; return; }
-      el.className = loading ? 'status on' : 'status';
-      el.innerHTML = loading ? `<div class="spinner"></div>${msg}` : msg;
-    });
-  }
+      div.innerHTML = `
+        <img src="data:image/jpeg;base64,${data.image}">
+        <p>${getLabel(data.bin_detected, data.prediction)}</p>
+      `;
 
-  /* inference */
-  async function runInference() {
-    if (!staged.length) { setStatus('no files staged'); return; }
-    [runBtn, runBtnMob].forEach(b => b.disabled=true);
-    emptyState.style.display = 'none';
-    gallery.style.display = 'grid';
-    const total = staged.length;
-    setStatus(`processing ${total} image${total!==1?'s':''}…`, true);
-    let done = 0;
-    for (const file of staged) {
-      const fd = new FormData();
-      fd.append('file', file);
-      try {
-        const res  = await fetch(API, { method:'POST', body:fd });
-        if (!res.ok) throw new Error(`HTTP ${res.status}`);
-        const data = await res.json();
-        appendCard(file.name, data.image, data.bin_detected, data.prediction);
-      } catch(err) {
-        appendError(file.name, err.message);
-      }
-      done++;
-      setStatus(`processed ${done}/${total}…`, true);
-      countLabel.textContent = `(${gallery.childElementCount})`;
+      gallery.appendChild(div);
+
+    } catch (e) {
+      let div = document.createElement("div");
+      div.className = "card";
+      div.innerHTML = `<p>Error: ${file.name}</p>`;
+      gallery.appendChild(div);
     }
-    setStatus(`done · ${done} image${done!==1?'s':''} processed`);
-    staged = [];
-    refreshBadge();
-    [runBtn, runBtnMob].forEach(b => b.disabled=false);
   }
 
-  function getResult(binDetected, prediction) {
-    if (!binDetected)     return { cls:'warn',  label:'No DMC Call',       sub:'Dustbin not detected'           };
-    if (prediction===1.0) return { cls:'alert', label:'DMC Call Required', sub:'Trash outside dustbin detected' };
-    return                       { cls:'ok',    label:'No DMC Call',       sub:'Area properly maintained'       };
-  }
+  setStatus("done");
+  files = [];
+}
 
-  function appendCard(name, imgB64, binDetected, prediction) {
-    const { cls, label, sub } = getResult(binDetected, prediction);
-    const card = document.createElement('div');
-    card.className = 'img-card';
-    card.style.animationDelay = `${gallery.childElementCount*55}ms`;
-    card.innerHTML = `
-      <div class="card-thumb">
-        <img src="data:image/jpeg;base64,${imgB64}" alt="${name}" loading="lazy">
-        <div class="card-fname">${name}</div>
-      </div>
-      <div class="card-result">
-        <div class="c-dot ${cls}"></div>
-        <div class="c-info">
-          <span class="c-label ${cls}">${label}</span>
-          <span class="c-sub">${sub}</span>
-        </div>
-      </div>`;
-    gallery.appendChild(card);
-  }
-
-  function appendError(name, msg) {
-    const card = document.createElement('div');
-    card.className = 'err-card';
-    card.innerHTML = `<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg><span>Failed: ${name} — ${msg}</span>`;
-    gallery.appendChild(card);
-  }
+function getLabel(bin, pred) {
+  if (!bin) return "No bin detected";
+  if (pred === 1.0) return "Trash detected (DMC required)";
+  return "Clean";
+}
 </script>
+
 </body>
 </html>
