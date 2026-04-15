@@ -7,10 +7,10 @@
   <style>
     :root {
       color-scheme: dark;
-      --surface: rgba(7, 11, 15, 0.36);
-      --surface-strong: rgba(8, 12, 16, 0.48);
-      --border: rgba(255, 255, 255, 0.16);
-      --border-soft: rgba(255, 255, 255, 0.11);
+      --surface: rgba(7, 11, 15, 0.24);
+      --surface-strong: rgba(8, 12, 16, 0.34);
+      --border: rgba(255, 255, 255, 0.18);
+      --border-soft: rgba(255, 255, 255, 0.14);
       --text: #f3f5f7;
       --muted: #a6afb9;
       --accent-strong: #ffffff;
@@ -28,9 +28,9 @@
       margin: 0;
       min-height: 100%;
       background:
-        radial-gradient(circle at center, rgba(255, 255, 255, 0.04), rgba(5, 7, 9, 0.42) 72%),
-        linear-gradient(rgba(5, 7, 9, 0.22), rgba(5, 7, 9, 0.42)),
-        radial-gradient(circle at top, rgba(255, 255, 255, 0.14), transparent 34%),
+        radial-gradient(circle at center, rgba(255, 255, 255, 0.08), rgba(5, 7, 9, 0.28) 72%),
+        linear-gradient(rgba(5, 7, 9, 0.12), rgba(5, 7, 9, 0.3)),
+        radial-gradient(circle at top, rgba(255, 255, 255, 0.18), transparent 36%),
         url("diamond_jubilee.jpg") center center / cover no-repeat fixed;
       color: var(--text);
       font-family: "Times New Roman", Georgia, serif;
@@ -53,15 +53,16 @@
       border: 1px solid var(--border);
       border-radius: var(--radius-xl);
       box-shadow: var(--shadow);
-      backdrop-filter: blur(12px);
+      backdrop-filter: blur(10px);
     }
 
     .topbar {
+      position: relative;
       display: flex;
       align-items: center;
       justify-content: space-between;
       gap: 16px;
-      padding: 14px 18px;
+      padding: 10px 14px;
     }
 
     .brand {
@@ -72,24 +73,53 @@
       text-transform: uppercase;
     }
 
-    .nav {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 10px;
+    .menu {
+      position: relative;
     }
 
-    .nav a {
+    .menu-toggle {
+      list-style: none;
       padding: 10px 14px;
       border-radius: 999px;
       border: 1px solid var(--border-soft);
       background: rgba(255, 255, 255, 0.08);
+      color: var(--text);
+      font-size: 0.92rem;
+      cursor: pointer;
+      user-select: none;
+    }
+
+    .menu-toggle::-webkit-details-marker {
+      display: none;
+    }
+
+    .nav {
+      position: absolute;
+      top: calc(100% + 10px);
+      right: 0;
+      min-width: 170px;
+      display: grid;
+      gap: 8px;
+      padding: 10px;
+      border-radius: 18px;
+      border: 1px solid var(--border-soft);
+      background: rgba(8, 12, 16, 0.3);
+      backdrop-filter: blur(14px);
+      box-shadow: var(--shadow);
+    }
+
+    .nav a {
+      padding: 10px 12px;
+      border-radius: 12px;
+      border: 1px solid var(--border-soft);
+      background: rgba(255, 255, 255, 0.06);
       color: var(--text);
       text-decoration: none;
       font-size: 0.92rem;
     }
 
     .nav a.active {
-      background: rgba(255, 255, 255, 0.18);
+      background: rgba(255, 255, 255, 0.14);
     }
 
     .hero,
@@ -139,7 +169,7 @@
       padding: 20px;
       border-radius: var(--radius-lg);
       border: 1px solid var(--border-soft);
-      background: rgba(8, 12, 16, 0.2);
+      background: rgba(8, 12, 16, 0.12);
     }
 
     .card h2 {
@@ -164,16 +194,7 @@
 
     @media (max-width: 900px) {
       .topbar {
-        flex-direction: column;
-        align-items: stretch;
-      }
-
-      .brand {
-        text-align: center;
-      }
-
-      .nav {
-        justify-content: center;
+        align-items: center;
       }
     }
   </style>
@@ -182,11 +203,14 @@
   <div class="page">
     <nav class="panel topbar">
       <a class="brand" href="index.html">Analog Minds</a>
-      <div class="nav">
-        <a href="index.html">Home</a>
-        <a href="about.html">About</a>
-        <a class="active" href="help.html">Help</a>
-      </div>
+      <details class="menu">
+        <summary class="menu-toggle">Menu</summary>
+        <div class="nav">
+          <a href="index.html">Home</a>
+          <a href="about.html">About</a>
+          <a class="active" href="help.html">Help</a>
+        </div>
+      </details>
     </nav>
 
     <header class="panel hero">
