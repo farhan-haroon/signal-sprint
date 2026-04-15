@@ -1241,7 +1241,7 @@
                 data-original-download="original-${escapeHtml(item.file.name)}"
                 data-analyzed-download="analyzed-${escapeHtml(item.file.name)}"
                 data-result-label="${label}"
-                data-remark-content="${getDetailedExplanation(item.binDetected, item.prediction)}"
+                data-remark-content="${getDetailedExplanation(binDetected, prediction)}"
               >
               <a class="download-link result-download-link" href="${originalSrc}" download="original-${escapeHtml(item.file.name)}" title="Download"><svg viewBox="0 0 24 24" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg></a>
               <details class="remark-drawer">
@@ -1340,15 +1340,15 @@
     }
 
     function getDetailedExplanation(binDetected, prediction) {
-      if (!binDetected) {
-        return "No bin detected in the image. Unable to perform trash analysis.";
+      if (!binDetected || binDetected === 0) {
+        return "No IITK authorized dustbin was found. DMC is not responsible.";
       }
 
-      if (prediction === 1.0) {
-        return "Trash has been detected in the bin and is overflowing. DMC (Dustbin Management Committee) should be immediately informed for collection.";
+      if (prediction === 1.0 || prediction === 1) {
+        return `${binDetected} no of dustbins found and trash is spilling. Immediate DMC action required.`;
       }
 
-      return "The bin is clean or has minimal trash. No immediate action required from DMC.";
+      return `${binDetected} no of dustbins found but the area appears to be clean. DMC action is not required.`;
     }
 
     function getLabel(binDetected, prediction) {
