@@ -767,7 +767,7 @@
       }
 
       .result-shell {
-        grid-template-columns: 1fr;
+        grid-template-columns: minmax(0, 1fr) auto;
       }
 
       .variant-head {
@@ -916,6 +916,12 @@
         <div class="image-modal-actions">
           <a class="download-link" id="imageModalDownload" href="#" download="result.jpg" title="Download"><svg viewBox="0 0 24 24" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg></a>
           <button class="image-modal-close" type="button" id="imageModalClose">Close</button>
+        </div>
+      </div>
+      <div class="image-modal-variants" id="imageModalVariants" style="display:none;">
+        <div style="display:flex; gap:8px; margin-bottom:12px;">
+          <button class="variant-button is-active" type="button" data-modal-variant="original">Original</button>
+          <button class="variant-button" type="button" data-modal-variant="analyzed">Analyzed</button>
         </div>
       </div>
       <img id="imageModalImage" alt="Expanded result preview">
@@ -1269,11 +1275,30 @@
       filesPreview.classList.remove("is-visible");
     }
 
-    function openImageModal(src, title) {
+    function openImageModal(src, title, imageElement) {
       imageModalImage.src = src;
       imageModalTitle.textContent = title;
       imageModalDownload.href = src;
       imageModalDownload.download = title;
+      
+      if (imageElement && imageElement.dataset.originalSrc) {
+        const variantDiv = document.getElementById("imageModalVariants");
+        variantDiv.style.display = "block";
+        const buttons = variantDiv.querySelectorAll(".variant-button");
+        
+        buttons.forEach((btn) => {
+          btn.classList.toggle("is-active", btn.dataset.modalVariant === "original");
+          btn.onclick = () => {
+            const variant = btn.dataset.modalVariant;
+            buttons.forEach((b) => b.classList.toggle("is-active", b === btn));
+            imageModalImage.src = variant === "analyzed" ? imageElement.dataset.analyzedSrc : imageElement.dataset.originalSrc;
+            imageModalDownload.href = imageModalImage.src;
+          };
+        });
+      } else {
+        document.getElementById("imageModalVariants").style.display = "none";
+      }
+      
       imageModal.classList.add("is-open");
       imageModal.setAttribute("aria-hidden", "false");
     }
