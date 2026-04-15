@@ -169,6 +169,17 @@
       font-size: 1.05rem;
       letter-spacing: 0.04em;
       text-transform: uppercase;
+      display: flex;
+      align-items: baseline;
+      gap: 10px;
+    }
+
+    .brand-byline {
+      font-size: 0.72rem;
+      letter-spacing: 0.02em;
+      text-transform: none;
+      color: var(--muted);
+      font-weight: 400;
     }
 
     .menu {
@@ -911,7 +922,7 @@
 <body>
   <div class="page">
     <nav class="panel topbar">
-      <a class="brand" href="index.html">Analog Minds</a>
+      <a class="brand" href="index.html">Analog Minds<span class="brand-byline">by Farhan Haroon and Shambhavi Pandey</span></a>
       <div class="topbar-actions">
         <button class="theme-toggle" id="themeToggle" title="Toggle background mode">
           <svg viewBox="0 0 24 24" class="theme-icon-light">
