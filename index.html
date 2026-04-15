@@ -491,10 +491,75 @@
     .card img {
       display: block;
       width: 100%;
-      aspect-ratio: 1 / 1;
+      height: 100%;
+      min-height: 220px;
       object-fit: cover;
       background: var(--bg-soft);
       cursor: pointer;
+    }
+
+    .result-shell {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto;
+      align-items: stretch;
+    }
+
+    .remark-drawer {
+      display: grid;
+      grid-template-columns: auto 0fr;
+      min-height: 100%;
+    }
+
+    .remark-drawer[open] {
+      grid-template-columns: auto minmax(160px, 200px);
+    }
+
+    .remark-tab {
+      list-style: none;
+      display: grid;
+      place-items: center;
+      padding: 12px 8px;
+      border-left: 1px solid var(--border-soft);
+      background: rgba(255, 255, 255, 0.08);
+      color: var(--text);
+      cursor: pointer;
+      writing-mode: vertical-rl;
+      transform: rotate(180deg);
+      letter-spacing: 0.08em;
+      font-size: 0.72rem;
+      text-transform: uppercase;
+      user-select: none;
+    }
+
+    .remark-tab::-webkit-details-marker {
+      display: none;
+    }
+
+    .remark-panel {
+      width: 0;
+      overflow: hidden;
+      border-left: 1px solid var(--border-soft);
+      background: rgba(8, 12, 16, 0.3);
+      color: var(--muted);
+    }
+
+    .remark-drawer[open] .remark-panel {
+      width: 100%;
+      padding: 14px;
+    }
+
+    .remark-title {
+      margin-bottom: 8px;
+      color: var(--text);
+      font-size: 0.82rem;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+    }
+
+    .remark-text {
+      font-size: 0.9rem;
+      line-height: 1.55;
+      word-break: break-word;
     }
 
     .card-body {
@@ -587,12 +652,6 @@
       word-break: break-word;
     }
 
-    .result-label {
-      color: var(--muted);
-      font-size: 0.9rem;
-      line-height: 1.45;
-    }
-
     @media (max-width: 980px) {
       .topbar {
         align-items: center;
@@ -636,6 +695,33 @@
 
       .gallery {
         grid-template-columns: 1fr;
+      }
+
+      .result-shell {
+        grid-template-columns: 1fr;
+      }
+
+      .remark-drawer {
+        grid-template-columns: 1fr;
+      }
+
+      .remark-drawer[open] {
+        grid-template-columns: 1fr;
+      }
+
+      .remark-tab {
+        writing-mode: initial;
+        transform: none;
+        border-left: none;
+        border-top: 1px solid var(--border-soft);
+        padding: 10px 14px;
+      }
+
+      .remark-panel,
+      .remark-drawer[open] .remark-panel {
+        width: 100%;
+        border-left: none;
+        border-top: 1px solid var(--border-soft);
       }
     }
   </style>
@@ -913,10 +999,18 @@
       const card = document.createElement("article");
       card.className = "card";
       card.innerHTML = `
-        <img src="${resultSrc}" alt="Inference result for ${escapeHtml(item.file.name)}">
+        <div class="result-shell">
+          <img src="${resultSrc}" alt="Inference result for ${escapeHtml(item.file.name)}">
+          <details class="remark-drawer">
+            <summary class="remark-tab">Remark</summary>
+            <div class="remark-panel">
+              <div class="remark-title">Inference</div>
+              <div class="remark-text">${escapeHtml(label)}</div>
+            </div>
+          </details>
+        </div>
         <div class="card-body">
           <div class="file-name">${escapeHtml(item.file.name)}</div>
-          <div class="result-label">${escapeHtml(label)}</div>
           <div class="card-actions">
             <a class="download-link" href="${resultSrc}" download="${escapeHtml(item.file.name)}">Download</a>
           </div>
@@ -934,9 +1028,14 @@
       const card = document.createElement("article");
       card.className = "card";
       card.innerHTML = `
+        <div class="result-shell">
+          <div class="remark-panel" style="width:100%; padding:18px; border-left:none;">
+            <div class="remark-title">Inference</div>
+            <div class="remark-text">Unable to process this image.</div>
+          </div>
+        </div>
         <div class="card-body">
           <div class="file-name">${escapeHtml(item.file.name)}</div>
-          <div class="result-label">Unable to process this image.</div>
         </div>
       `;
       gallery.appendChild(card);
