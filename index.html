@@ -64,15 +64,13 @@
 
     .hero {
       display: flex;
-      align-items: end;
-      justify-content: space-between;
-      gap: 24px;
+      align-items: center;
+      justify-content: center;
       padding: 24px 26px;
     }
 
     .hero-copy {
       max-width: none;
-      flex: 1;
       text-align: center;
     }
 
@@ -105,22 +103,6 @@
       color: var(--muted);
       line-height: 1.7;
       font-size: 0.98rem;
-    }
-
-    .hero-meta {
-      display: flex;
-      gap: 10px;
-      flex-wrap: wrap;
-      justify-content: flex-end;
-    }
-
-    .meta-chip {
-      padding: 10px 14px;
-      border-radius: 999px;
-      background: var(--surface-faint);
-      border: 1px solid var(--border-soft);
-      color: var(--muted);
-      font-size: 0.9rem;
     }
 
     .workspace {
@@ -388,10 +370,6 @@
         flex-direction: column;
         align-items: center;
       }
-
-      .hero-meta {
-        justify-content: center;
-      }
     }
 
     @media (max-width: 640px) {
@@ -430,11 +408,6 @@
         <p>
           A minimal, dark interface for quick image submission and clean result review.
         </p>
-      </div>
-      <div class="hero-meta">
-        <div class="meta-chip">No login</div>
-        <div class="meta-chip">Camera + upload</div>
-        <div class="meta-chip">Live API</div>
       </div>
     </header>
 
