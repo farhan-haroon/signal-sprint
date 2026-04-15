@@ -50,6 +50,15 @@
         linear-gradient(rgba(5, 7, 9, 0.95), rgba(5, 7, 9, 0.95));
     }
 
+    html.image-only-bg, body.image-only-bg {
+      background-color: #000;
+    }
+
+    html.image-only-bg .page,
+    body.image-only-bg .page {
+      display: none;
+    }
+
     body {
       min-height: 100dvh;
     }
@@ -123,6 +132,10 @@
       stroke: currentColor;
       stroke-width: 1.8;
       fill: none;
+    }
+
+    .theme-toggle svg.theme-icon-image-only {
+      fill: currentColor;
     }
 
     .brand {
@@ -885,6 +898,11 @@
           <svg viewBox="0 0 24 24" class="theme-icon-dark" style="display: none;">
             <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
           </svg>
+          <svg viewBox="0 0 24 24" class="theme-icon-image-only" style="display: none;">
+            <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+            <circle cx="8.5" cy="8.5" r="1.5"></circle>
+            <polyline points="21 15 16 10 5 21"></polyline>
+          </svg>
         </button>
         <details class="menu">
           <summary class="menu-toggle">Menu</summary>
@@ -900,7 +918,7 @@
     <header class="panel hero">
       <div class="hero-copy">
         <p class="eyebrow">Dustbin Management Committee, IIT Kanpur</p>
-        <h1>Upload or capture an image for analysis.</h1>
+        <h1>Capture or upload an image for analysis.</h1>
         <p>
           ANALOG MINDS by Farhan Haroon and Shambhavi Pandey (Perception and Intelligence Lab)
         </p>
@@ -1445,6 +1463,7 @@
     const themeToggle = document.getElementById("themeToggle");
     const themeIconLight = themeToggle.querySelector(".theme-icon-light");
     const themeIconDark = themeToggle.querySelector(".theme-icon-dark");
+    const themeIconImageOnly = themeToggle.querySelector(".theme-icon-image-only");
     
     const backgroundImages = [
       "diamond_jubilee.jpg",
@@ -1460,8 +1479,9 @@
       const html = document.documentElement;
       const body = document.body;
       const isSolidBg = html.classList.contains("solid-bg");
+      const isImageOnly = html.classList.contains("image-only-bg");
       
-      if (!isSolidBg) {
+      if (!isSolidBg && !isImageOnly) {
         const imageSrc = backgroundImages[bgImageIndex];
         const bgGradient = `
           radial-gradient(circle at center, rgba(255, 255, 255, 0.08), rgba(5, 7, 9, 0.32) 72%),
@@ -1471,18 +1491,29 @@
         `;
         html.style.background = bgGradient;
         body.style.background = bgGradient;
+      } else if (isImageOnly) {
+        const imageSrc = backgroundImages[bgImageIndex];
+        const bgImage = `url("${imageSrc}") center center / cover no-repeat fixed`;
+        html.style.background = bgImage;
+        body.style.background = bgImage;
       }
     }
     
     function updateThemeIcons() {
       const html = document.documentElement;
       const isSolidBg = html.classList.contains("solid-bg");
-      if (isSolidBg) {
-        themeIconLight.style.display = "none";
+      const isImageOnly = html.classList.contains("image-only-bg");
+      
+      themeIconLight.style.display = "none";
+      themeIconDark.style.display = "none";
+      themeIconImageOnly.style.display = "none";
+      
+      if (isImageOnly) {
+        themeIconImageOnly.style.display = "block";
+      } else if (isSolidBg) {
         themeIconDark.style.display = "block";
       } else {
         themeIconLight.style.display = "block";
-        themeIconDark.style.display = "none";
       }
     }
     
@@ -1490,15 +1521,27 @@
       const html = document.documentElement;
       const body = document.body;
       const isSolidBg = html.classList.contains("solid-bg");
+      const isImageOnly = html.classList.contains("image-only-bg");
       
-      if (isSolidBg) {
-        html.classList.remove("solid-bg");
-        body.classList.remove("solid-bg");
+      // Cycle through states: translucent -> solid -> image-only -> translucent
+      if (isImageOnly) {
+        // image-only -> translucent
+        html.classList.remove("image-only-bg");
+        body.classList.remove("image-only-bg");
         bgImageIndex = (bgImageIndex + 1) % backgroundImages.length;
         localStorage.setItem("bgImageIndex", bgImageIndex);
         updateBackgroundImage();
         localStorage.setItem("bgMode", "translucent");
+      } else if (isSolidBg) {
+        // solid -> image-only
+        html.classList.remove("solid-bg");
+        body.classList.remove("solid-bg");
+        html.classList.add("image-only-bg");
+        body.classList.add("image-only-bg");
+        updateBackgroundImage();
+        localStorage.setItem("bgMode", "image-only");
       } else {
+        // translucent -> solid
         html.classList.add("solid-bg");
         body.classList.add("solid-bg");
         html.style.background = "linear-gradient(rgba(5, 7, 9, 0.95), rgba(5, 7, 9, 0.95))";
@@ -1513,6 +1556,10 @@
     if (savedBgMode === "solid") {
       document.documentElement.classList.add("solid-bg");
       document.body.classList.add("solid-bg");
+    } else if (savedBgMode === "image-only") {
+      document.documentElement.classList.add("image-only-bg");
+      document.body.classList.add("image-only-bg");
+      updateBackgroundImage();
     } else {
       updateBackgroundImage();
     }
