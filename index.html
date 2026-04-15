@@ -82,6 +82,12 @@
       border-radius: var(--radius-xl);
       box-shadow: var(--shadow);
       backdrop-filter: blur(10px);
+      transition: background 0.3s ease, border-color 0.3s ease;
+    }
+
+    html.solid-bg .topbar {
+      background: rgba(5, 7, 9, 0.95);
+      border-color: rgba(255, 255, 255, 0.1);
     }
 
     .topbar-actions {
@@ -1007,7 +1013,16 @@
           <button class="variant-button" type="button" data-modal-variant="analyzed">Analyzed</button>
         </div>
       </div>
-      <img id="imageModalImage" alt="Expanded result preview">
+      <div style="display: grid; grid-template-columns: minmax(0, 1fr) auto;">
+        <img id="imageModalImage" alt="Expanded result preview">
+        <details class="remark-drawer" id="imageModalRemarkDrawer" style="display:none;">
+          <summary class="remark-tab">Remark</summary>
+          <div class="remark-panel">
+            <div class="remark-title">Result</div>
+            <div class="remark-text" id="imageModalRemarkText"></div>
+          </div>
+        </details>
+      </div>
     </div>
   </div>
 
@@ -1181,6 +1196,8 @@
                 data-analyzed-alt="Inference result for ${escapeHtml(item.file.name)}"
                 data-original-download="original-${escapeHtml(item.file.name)}"
                 data-analyzed-download="analyzed-${escapeHtml(item.file.name)}"
+                data-result-label="${label}"
+                data-remark-content="${getDetailedExplanation(item.binDetected, item.prediction)}"
               >
               <a class="download-link result-download-link" href="${originalSrc}" download="original-${escapeHtml(item.file.name)}" title="Download"><svg viewBox="0 0 24 24" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg></a>
               <details class="remark-drawer">
@@ -1380,6 +1397,18 @@
         });
       } else {
         document.getElementById("imageModalVariants").style.display = "none";
+      }
+      
+      // Show remark if available
+      const remarkDrawer = document.getElementById("imageModalRemarkDrawer");
+      const remarkText = document.getElementById("imageModalRemarkText");
+      if (imageElement && imageElement.dataset.resultLabel) {
+        const remarkContent = imageElement.dataset.remarkContent || imageElement.dataset.resultLabel;
+        remarkText.textContent = remarkContent;
+        remarkDrawer.style.display = "block";
+        remarkDrawer.removeAttribute("open");
+      } else {
+        remarkDrawer.style.display = "none";
       }
       
       imageModal.classList.add("is-open");
