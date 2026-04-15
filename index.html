@@ -239,6 +239,8 @@
       display: grid;
       grid-template-columns: repeat(2, minmax(0, 1fr));
       gap: 10px;
+      width: min(520px, 100%);
+      margin: 0 auto;
     }
 
     button {
@@ -301,6 +303,16 @@
       justify-content: space-between;
       gap: 16px;
       margin-bottom: 18px;
+    }
+
+    .results-meta {
+      display: grid;
+      gap: 12px;
+      justify-items: end;
+    }
+
+    .results-meta .status-panel {
+      min-width: min(280px, 100%);
     }
 
     .queue-chip {
@@ -403,6 +415,10 @@
         align-items: stretch;
       }
 
+      .results-meta {
+        justify-items: stretch;
+      }
+
       .gallery {
         grid-template-columns: 1fr;
       }
@@ -476,11 +492,6 @@
               <button class="primary" type="button" onclick="runInference()">Run inference</button>
               <button class="ghost" type="button" onclick="clearAll()">Clear</button>
             </div>
-
-            <div class="status-panel">
-              <div class="status-label">Status</div>
-              <div class="status-text" id="status">Waiting for images.</div>
-            </div>
           </div>
         </div>
       </aside>
@@ -491,7 +502,13 @@
             <h2>Results</h2>
             <p>Annotated previews and prediction labels appear here.</p>
           </div>
-          <div class="queue-chip" id="summary">0 files queued</div>
+          <div class="results-meta">
+            <div class="queue-chip" id="summary">0 files queued</div>
+            <div class="status-panel">
+              <div class="status-label">Status</div>
+              <div class="status-text" id="status">Waiting for images.</div>
+            </div>
+          </div>
         </div>
 
         <div class="results-scroll">
