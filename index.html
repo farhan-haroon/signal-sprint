@@ -643,7 +643,7 @@
       height: 32px;
       border: none;
       border-radius: 6px;
-      background: rgba(255, 255, 255, 0.12);
+      background: rgba(0, 0, 0, 0.5);
       color: var(--text);
       text-decoration: none;
       font-size: 0.84rem;
@@ -1049,7 +1049,7 @@
           }
 
           const data = await response.json();
-          appendResultCard(item, data.image, getLabel(data.bin_detected, data.prediction));
+          appendResultCard(item, data.image, getLabel(data.bin_detected, data.prediction), data.bin_detected, data.prediction);
         } catch (error) {
           appendErrorCard(item);
         }
@@ -1062,7 +1062,7 @@
       setStatus("Inference complete.");
     }
 
-    function appendResultCard(item, imageBase64, label) {
+    function appendResultCard(item, imageBase64, label, binDetected, prediction) {
       const originalSrc = URL.createObjectURL(item.file);
       const resultSrc = "data:image/jpeg;base64," + imageBase64;
       resultAssetUrls.push(originalSrc);
@@ -1097,15 +1097,15 @@
               <details class="remark-drawer">
                 <summary class="remark-tab">Remark</summary>
                 <div class="remark-panel">
-                  <div class="remark-title result-remark-title">Analysis</div>
-                  <div class="remark-text result-remark-text">${label}</div>
+                  <div class="remark-title result-remark-title">Result</div>
+                  <div class="remark-text result-remark-text" data-result-label="${label}"></div>
                 </div>
               </details>
             </div>
           </section>
         </div>
         <div class="card-body">
-          <div class="file-name">${escapeHtml(item.file.name)}</div>
+          <div class="file-name result-label">${label}</div>
         </div>
       `;
       const image = card.querySelector(".result-main-image");
@@ -1113,6 +1113,11 @@
       const remarkTitle = card.querySelector(".result-remark-title");
       const remarkText = card.querySelector(".result-remark-text");
       const buttons = card.querySelectorAll(".variant-button");
+
+      // Set initial remark text with detailed explanation
+      if (remarkText) {
+        remarkText.textContent = getDetailedExplanation(binDetected, prediction);
+      }
 
       if (image) {
         image.addEventListener("click", () => {
@@ -1184,16 +1189,28 @@
       resultAssetUrls = [];
     }
 
+    function getDetailedExplanation(binDetected, prediction) {
+      if (!binDetected) {
+        return "No bin detected in the image. Unable to perform trash analysis.";
+      }
+
+      if (prediction === 1.0) {
+        return "Trash has been detected in the bin and is overflowing. DMC (Dustbin Management Committee) should be immediately informed for collection.";
+      }
+
+      return "The bin is clean or has minimal trash. No immediate action required from DMC.";
+    }
+
     function getLabel(binDetected, prediction) {
       if (!binDetected) {
         return "No bin detected";
       }
 
       if (prediction === 1.0) {
-        return "Trash detected (DMC required)";
+        return "DMC should be informed";
       }
 
-      return "Clean";
+      return "DMC should not be informed";
     }
 
     function escapeHtml(value) {
