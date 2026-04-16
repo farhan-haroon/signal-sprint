@@ -6,7 +6,7 @@ import torch
 import tempfile
 from ultralytics import YOLO
 
-IMG_SIZE = 512
+IMG_SIZE = 320  # reduced for speed
 
 def load_model():
     script_dir = os.path.dirname(__file__)
@@ -24,6 +24,11 @@ def load_model():
     det_model = YOLO(tmp_det.name)
     seg_model = YOLO(tmp_seg.name)
 
+    # ✅ USE GPU
+    device = "cuda" if torch.cuda.is_available() else "cpu"
+    det_model.to(device)
+    seg_model.to(device)
+
     return {
         "det": det_model,
         "seg": seg_model
@@ -38,14 +43,12 @@ def is_box_outside_mask(box, mask):
     return np.sum(region) == 0
 
 
-def predict(model, image_path, return_image=False):
-
+def predict(model, img, return_image=False):
     det_model = model["det"]
     seg_model = model["seg"]
 
-    img = cv2.imread(image_path)
     if img is None:
-        return 0.0, None
+        return 0.0, None, False
 
     img = cv2.resize(img, (IMG_SIZE, IMG_SIZE))
     annotated = img.copy()
@@ -66,10 +69,11 @@ def predict(model, image_path, return_image=False):
             elif label == "trash":
                 trash_boxes.append(box)
 
+    # 🚀 Skip segmentation if no bin (major speed gain)
     if len(bin_boxes) == 0:
-        return 0.0, annotated, False  # (prediction, annotated_image, bin_detected)
+        return 0.0, annotated, False
 
-    # Draw bounding boxes only if bin is detected
+    # Draw boxes
     if det_results.boxes is not None:
         for box, cls in zip(det_results.boxes.xyxy, det_results.boxes.cls):
             label = det_model.names[int(cls)]
@@ -102,7 +106,7 @@ def predict(model, image_path, return_image=False):
 
         opening_mask = combined_mask
 
-        # overlay mask (green)
+        # overlay mask
         colored_mask = np.zeros_like(annotated)
         colored_mask[:,:,1] = opening_mask * 255
         annotated = cv2.addWeighted(annotated, 1.0, colored_mask, 0.4, 0)
@@ -113,11 +117,10 @@ def predict(model, image_path, return_image=False):
     if opening_mask is None:
         if len(trash_boxes) > 0:
             result = 1.0
-
     elif len(trash_boxes) > 0:
         for box in trash_boxes:
             if is_box_outside_mask(box, opening_mask):
                 result = 1.0
                 break
 
-    return result, annotated, len(bin_boxes)  # (prediction, annotated_image, bin_detected)
+    return result, annotated, len(bin_boxes)

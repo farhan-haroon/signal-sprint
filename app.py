@@ -1,8 +1,6 @@
 from fastapi import FastAPI, File, UploadFile
 from fastapi.middleware.cors import CORSMiddleware
-import shutil
-import tempfile
-import os
+import numpy as np
 import cv2
 import base64
 
@@ -18,21 +16,21 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+# ✅ Load once (already good)
 model = load_model()
 
 @app.post("/predict")
 async def run_inference(file: UploadFile = File(...)):
-    tmp = tempfile.NamedTemporaryFile(delete=False, suffix=".jpg")
+    # 🚀 Read image directly (NO DISK I/O)
+    contents = await file.read()
+    nparr = np.frombuffer(contents, np.uint8)
+    img = cv2.imdecode(nparr, cv2.IMREAD_COLOR)
 
-    with open(tmp.name, "wb") as buffer:
-        shutil.copyfileobj(file.file, buffer)
+    result, annotated, bin_detected = predict(model, img, return_image=True)
 
-    result, annotated, bin_detected = predict(model, tmp.name, return_image=True)
-
+    # Encode output
     _, buffer = cv2.imencode('.jpg', annotated)
     img_str = base64.b64encode(buffer).decode()
-
-    os.remove(tmp.name)
 
     return {
         "prediction": float(result),
