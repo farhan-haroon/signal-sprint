@@ -102,6 +102,7 @@ def predict(model, img, return_image=False):
 
         for mask in masks:
             mask = (mask > 0.5).astype(np.uint8)
+            mask = cv2.resize(mask, (IMG_SIZE, IMG_SIZE), interpolation=cv2.INTER_NEAREST)
             combined_mask = np.maximum(combined_mask, mask)
 
         opening_mask = combined_mask

@@ -491,6 +491,11 @@
       color: #0d0d0d;
     }
 
+    .primary:disabled {
+      opacity: 0.45;
+      cursor: not-allowed;
+    }
+
     .ghost {
       background: rgba(255, 255, 255, 0.14);
       color: var(--text);
@@ -1013,7 +1018,7 @@
 
           <div class="input-actions">
             <div class="button-row">
-              <button class="primary" type="button" onclick="runInference()">Analyze</button>
+              <button class="primary" type="button" id="analyzeButton" onclick="runInference()">Analyze</button>
               <button class="ghost" type="button" onclick="clearAll()">Clear</button>
             </div>
           </div>
@@ -1179,6 +1184,9 @@
         return;
       }
 
+      const analyzeButton = document.getElementById("analyzeButton");
+      analyzeButton.disabled = true;
+
       toggleEmptyState();
       setStatus("Running inference on " + queue.length + " file(s)...");
 
@@ -1211,6 +1219,7 @@
       clearInputs();
       updateSummary();
       setStatus("Inference complete.");
+      analyzeButton.disabled = false;
     }
 
     function appendResultCard(item, imageBase64, label, binDetected, prediction) {
